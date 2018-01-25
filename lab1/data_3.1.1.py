@@ -11,9 +11,6 @@ N = 100
 x1, x2 = np.random.multivariate_normal(mean_x, cov_x, N).T
 y1, y2 = np.random.multivariate_normal(mean_y, cov_y, N).T
 
-# X = np.column_stack((x1, x2))
-# Y = np.column_stack((y1, y2))
-
 
 plt.plot(x1, x2,  'x')
 plt.plot(y1, y2, 'o')
