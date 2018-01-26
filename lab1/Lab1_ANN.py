@@ -56,6 +56,17 @@ def generate_nonlinearData():
     target = T[s]
     return patterns, target
 
+def perceptron_learning(T, X, W):
+    eta = 0.001
+    output = W.dot(X)
+    sign = output - T
+    sign[sign > 0] = 1
+    sign[sign < 0] = -1
+    DeltaW = eta * sign.dot(np.array(X).T)
+
+    return DeltaW
+
+
 def delta_rule(T, X, W):
     eta = 0.001
     updateW = -eta * (W.dot(X) - T).dot(X.T)
