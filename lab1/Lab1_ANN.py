@@ -24,8 +24,8 @@ def generate_linearData():
     patterns = np.concatenate(([X[s]], [Y[s]], [bias]), axis=0)
     target = T[s]
 
-    print(patterns)
-    print(target)
+    #print(patterns)
+    #print(target)
 
     # plt.plot(x1, x2,  'x')
     # plt.plot(y1, y2, 'o')
@@ -110,7 +110,7 @@ def training():
         y = np.array([p[1], p[1]]).dot(k) + [p[0], -p[0]]/l
         axarr[i].plot(x, y, color='r')
         #plt.axis()
-        plt.show()
+        #plt.show()
 
 def phi(x):
     phi = 2.0 / (1 + np.exp(-x)) - 1
@@ -151,6 +151,19 @@ def weight_update(eta, delta, outputs, n_layers, alpha, dW, updateW):
         updateW[layer] = eta*dW[layer]
     return updateW
 
+def mean_sq_error(outputs, targets):
+    msq =  np.sum((np.power(np.array(outputs) - np.array(targets),2))) / np.size(outputs)
+    return msq
+
+def miscl_ratio(outputs, targets):
+    miscl = 0
+    for i,x in enumerate(targets):
+        if (x != outputs[i]):
+            miscl += 1
+    ratio = miscl/np.size(targets)
+    return ratio
+
+
 def backforward_prop():
     epochs = 20
     n_nodes = [3,2]
@@ -161,11 +174,12 @@ def backforward_prop():
     updateW = np.zeros([1, n_layers])
     patterns, targets = generate_linearData()
     X = patterns
+    outputs = []
     for i in range(epochs):
         outputs, weights = forward_pass(X, n_nodes, n_layers)
         delta = backward_pass()
         weight_update = weight_update(eta, delta, outputs, n_layers, alpha,dW, updateW)
         weights = weights + weight_update
 
-training()
 
+print(miscl_ratio([1,1,1,1], [-1, 1, -1, 1]))
