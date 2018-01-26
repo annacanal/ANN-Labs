@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-mean_x = [15, 0]
-mean_y = [0, 15]
+mean_x = [-15, -5]
+mean_y = [15, 5]
 cov_x = [[100, 0], [0, 100]]
 cov_y = [[100, 0], [0, 100]]
 N = 100
