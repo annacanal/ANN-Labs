@@ -120,10 +120,9 @@ def phi_prime(phi):
     phi_prime = (1+phi)*(1- phi)/2.0
     return phi_prime
 
-
 def forward_pass(X, n_layers, n_nodes):
-    weights = np.zeros([1,np.size(n_layers)])
-    new_inputs = np.zeros([1, np.size(n_layers)])
+    weights = np.zeros([1,n_layers])
+    new_inputs = np.zeros([1, n_layers+1])
     new_inputs[0] = X
     for layer in range(n_layers):
         weights[layer] = W_init(n_nodes[layer], new_inputs[layer])
@@ -132,9 +131,10 @@ def forward_pass(X, n_layers, n_nodes):
         # Add bias to the new inputs for the next iteration
         bias = np.ones([1, np.size(new_inputs[layer+1], 1)])
         new_inputs[layer + 1] = np.concatenate((new_inputs[layer+1], [bias]), axis=0)
-    new_inputs[n_layers-1] = output
+    new_inputs[n_layers] = output
     outputs= new_inputs
     return outputs, weights
+
 
 def backward_pass(outputs, weights, targets):
     n_layers = len(outputs)-1
@@ -145,18 +145,27 @@ def backward_pass(outputs, weights, targets):
     return delta
 
 
+def weight_update(eta, delta, outputs, n_layers, alpha, dW, updateW):
+    for layer in range(n_layers):
+        dW[layer] = (alpha*dW[layer] ) - ( (delta[layer]).dot(outputs[layer].T)*(1 - alpha))
+        updateW[layer] = eta*dW[layer]
+    return updateW
+
 def backforward_prop():
     epochs = 20
     n_nodes = [3,2]
     n_layers = 2
+    eta = 0.001
+    alpha= 0.9
+    dW = np.zeros([1,n_layers])
+    updateW = np.zeros([1, n_layers])
     patterns, targets = generate_linearData()
     X = patterns
     for i in range(epochs):
-        outputs,weights = forward_pass(X,n_nodes, n_layers)
-        backward_pass()
-        updateW = weight_update()
-        W = W + updateW
-    return 0
+        outputs, weights = forward_pass(X, n_nodes, n_layers)
+        delta = backward_pass()
+        weight_update = weight_update(eta, delta, outputs, n_layers, alpha,dW, updateW)
+        weights = weights + weight_update
 
 training()
 
