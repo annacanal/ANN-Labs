@@ -119,8 +119,13 @@ def forward_pass(X,n_nodes1, n_nodes2):
     O = phi(W.dot(H))
     return O
 
-def backward_pass():
-    return 0
+def backward_pass(outputs, weights, targets):
+    n_layers = len(outputs)-1
+    delta = np.zeros([1,np.size(layers)])
+    delta[0] = (outputs[n_layers] - targets).dot(phi_prime((outputs[n_layers-1]).dot(weights[n_layers-1])))
+    for i in range(1, n_layers):
+        delta[i] = ((weight[n-layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
+    return delta
 
 
 def backforward_prop():
