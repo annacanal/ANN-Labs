@@ -74,8 +74,8 @@ def delta_rule(T, X, W):
     updateW = -eta * (W.dot(X) - T).dot(X.T)
     return updateW
 
-def W_init(targets,X):
-    W = np.zeros([np.size(targets, 0), np.size(X, 0)])
+def W_init(nodes,X):
+    W = np.zeros((nodes, np.shape(X)[0]))
     W = np.random.normal(0,0.001,W.shape)
     return W
 
@@ -123,8 +123,8 @@ def phi_prime(phi):
     return phi_prime
 
 def forward_pass(X, n_layers, n_nodes):
-    weights = np.zeros([1,n_layers])
-    new_inputs = np.zeros([1, n_layers+1])
+    weights = [n_layers]
+    new_inputs = [n_layers+1]
     new_inputs[0] = X
     for layer in range(n_layers):
         weights[layer] = W_init(n_nodes[layer], new_inputs[layer])
@@ -138,12 +138,12 @@ def forward_pass(X, n_layers, n_nodes):
     return outputs, weights
 
 
-def backward_pass(outputs, weights, targets):
-    n_layers = len(outputs)-1
-    delta = np.zeros([1,np.size(layers)])
+def backward_pass(outputs, weights, targets, n_layers):
+    #layers = len(outputs)-1
+    delta = np.zeros(1,n_layers)
     delta[0] = (outputs[n_layers] - targets).dot(phi_prime((outputs[n_layers-1]).dot(weights[n_layers-1])))
     for i in range(1, n_layers):
-        delta[i] = ((weight[n-layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
+        delta[i] = ((weights[n_layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
     return delta
 
 
@@ -178,10 +178,11 @@ def backforward_prop():
     X = patterns
     outputs = []
     for i in range(epochs):
-        outputs, weights = forward_pass(X, n_nodes, n_layers)
-        delta = backward_pass()
+        outputs, weights = forward_pass(X, n_layers, n_nodes)
+        delta = backward_pass(outputs, weights, targets, n_layers)
         weight_update = weight_update(eta, delta, outputs, n_layers, alpha,dW, updateW)
         weights = weights + weight_update
+        print(mean_sq_error(outputs, targets))
 
 
 # def autoencoder():        The encoder problem - needs the implementation of backprop. 
