@@ -26,7 +26,8 @@ target =T[s]
 # print(patterns)
 # print(target)
 
-plt.plot(x1, x2,  'x')
+
+plt.plot(x1, x2, 'x')
 plt.plot(y1, y2, 'o')
 plt.axis('equal')
 plt.show()

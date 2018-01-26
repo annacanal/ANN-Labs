@@ -26,8 +26,8 @@ def generate_linearData():
     patterns = np.concatenate(([X[s]], [Y[s]], [bias]), axis=0)
     target = T[s]
 
-    print(patterns)
-    print(target)
+    #print(patterns)
+    #print(target)
 
     # plt.plot(x1, x2,  'x')
     # plt.plot(y1, y2, 'o')
@@ -112,7 +112,7 @@ def training():
         y = np.array([p[1], p[1]]).dot(k) + [p[0], -p[0]]/l
         axarr[i].plot(x, y, color='r')
         #plt.axis()
-        plt.show()
+        #plt.show()
 
 def phi(x):
     phi = 2.0 / (1 + np.exp(-x)) - 1
@@ -122,10 +122,9 @@ def phi_prime(phi):
     phi_prime = (1+phi)*(1- phi)/2.0
     return phi_prime
 
-
 def forward_pass(X, n_layers, n_nodes):
-    weights = np.zeros([1,np.size(n_layers)])
-    new_inputs = np.zeros([1, np.size(n_layers)])
+    weights = np.zeros([1,n_layers])
+    new_inputs = np.zeros([1, n_layers+1])
     new_inputs[0] = X
     for layer in range(n_layers):
         weights[layer] = W_init(n_nodes[layer], new_inputs[layer])
@@ -134,9 +133,10 @@ def forward_pass(X, n_layers, n_nodes):
         # Add bias to the new inputs for the next iteration
         bias = np.ones([1, np.size(new_inputs[layer+1], 1)])
         new_inputs[layer + 1] = np.concatenate((new_inputs[layer+1], [bias]), axis=0)
-    new_inputs[n_layers-1] = output
+    new_inputs[n_layers] = output
     outputs= new_inputs
     return outputs, weights
+
 
 def backward_pass(outputs, weights, targets):
     n_layers = len(outputs)-1
@@ -146,20 +146,43 @@ def backward_pass(outputs, weights, targets):
         delta[i] = ((weight[n-layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
     return delta
 
+
+def weight_update(eta, delta, outputs, n_layers, alpha, dW, updateW):
+    for layer in range(n_layers):
+        dW[layer] = (alpha*dW[layer] ) - ( (delta[layer]).dot(outputs[layer].T)*(1 - alpha))
+        updateW[layer] = eta*dW[layer]
+    return updateW
+
+def mean_sq_error(outputs, targets):
+    msq =  np.sum((np.power(np.array(outputs) - np.array(targets),2))) / np.size(outputs)
+    return msq
+
+def miscl_ratio(outputs, targets):
+    miscl = 0
+    for i,x in enumerate(targets):
+        if (x != outputs[i]):
+            miscl += 1
+    ratio = miscl/np.size(targets)
+    return ratio
+
+
 def backforward_prop():
     epochs = 20
     n_nodes = [3,2]
     n_layers = 2
+    eta = 0.001
+    alpha= 0.9
+    dW = np.zeros([1,n_layers])
+    updateW = np.zeros([1, n_layers])
     patterns, targets = generate_linearData()
     X = patterns
+    outputs = []
     for i in range(epochs):
-        outputs,weights = forward_pass(X,n_nodes, n_layers)
-        backward_pass()
-        updateW = weight_update()
-        W = W + updateW
-    return 0
+        outputs, weights = forward_pass(X, n_nodes, n_layers)
+        delta = backward_pass()
+        weight_update = weight_update(eta, delta, outputs, n_layers, alpha,dW, updateW)
+        weights = weights + weight_update
 
-training()
 
 # def autoencoder():        The encoder problem - needs the implementation of backprop. 
     #Two layer perceptron: 8 input - 3 nodes - 8 outputs
