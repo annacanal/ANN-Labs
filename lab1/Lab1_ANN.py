@@ -101,7 +101,31 @@ def training():
         #plt.axis()
         plt.show()
 
+def phi(x):
+    phi = 2.0 / (1 + np.exp(-x)) - 1
+    return phi
 
+def phi_prime(phi):
+    phi_prime = (1+phi)*(1- phi)/2.0
+    return phi_prime
+
+def forward_pass(X,n_nodes1, n_nodes2):
+    V = W_init(n_nodes1, X)
+    H = phi(V.dot(X))
+    #Add bias to H
+    bias = np.ones([1,np.size(H,1)])
+    H = np.concatenate((H, [bias]), axis=0)
+    W = W_init(n_nodes2, H)
+    O = phi(W.dot(H))
+    return O
+
+def backward_pass():
+    return 0
+
+
+def backforward_prop():
+    
+    return 0
 
 training()
 
