@@ -1,13 +1,15 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import pylab
+from mpl_toolkits.mplot3d import Axes3D
 
 def generate_linearData():
     mean_x = [-30, -30]
     mean_y = [30, 30]
     cov_x = [[100, 0], [0, 100]]
     cov_y = [[100, 0], [0, 100]]
-    N = 5
+    N = 8
 
     x1, x2 = np.random.multivariate_normal(mean_x, cov_x, N).T
     y1, y2 = np.random.multivariate_normal(mean_y, cov_y, N).T
@@ -144,7 +146,6 @@ def backward_pass(outputs, weights, targets):
         delta[i] = ((weight[n-layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
     return delta
 
-
 def backforward_prop():
     epochs = 20
     n_nodes = [3,2]
@@ -160,3 +161,21 @@ def backforward_prop():
 
 training()
 
+# def autoencoder():        The encoder problem - needs the implementation of backprop. 
+    #Two layer perceptron: 8 input - 3 nodes - 8 outputs
+    #Only one node is active: [-1 -1 -1 1 -1 -1 -1 -1]: 1 = active and -1 = nonactive
+    # X = np.array([1, -1, -1, -1, -1, -1, -1, -1]).T
+    # np.random.shuffle(X)
+    # outputs, weights = forward_pass(X, 2, 3)
+    # delta = backward_pass(outputs, weights, targets)
+
+def approx_function():
+    #Not done yet, something is probably off. 
+    x = np.arange(-5, 5, 0.5)
+    y = np.arange(-5, 5, 0.5)
+    z = np.exp((x*x.T+y*y.T)/10) - 0.5
+    xv, yv = np.meshgrid(x, y)
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    surf = ax.plot_surface(X,T,U)
+    plt.show()
