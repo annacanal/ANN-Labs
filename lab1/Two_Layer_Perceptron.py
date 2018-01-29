@@ -110,4 +110,4 @@ def backforward_prop():
     # outputs, weights = forward_pass(X, 2, 3)
     # delta = backward_pass(outputs, weights, targets)
 
-backforward_prop()
+#backforward_prop()
