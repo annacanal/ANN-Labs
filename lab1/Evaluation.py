@@ -21,7 +21,7 @@ def Plot_error_curve(name,iterations,errors):
     plt.show()
 
 #Plot the learning in each iteration.
-def Plot_learning_curve(name,iterations,errors):
+def Plot_learning_curve(name,iterations,acc):
     plt.title(name)
-    plt.plot(iterations, 1-errors,'blue')
+    plt.plot(iterations, acc,'blue')
     plt.show()
