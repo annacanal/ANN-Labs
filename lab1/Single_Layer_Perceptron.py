@@ -55,6 +55,7 @@ def training():
     epochs = 20
     eta = 0.0001
     errors = []
+    acc=[]
     patterns, targets = Data_Generation.generate_linearData()
     #patterns, targets = Data_Generation.generate_nonlinearData()
     X = patterns
@@ -75,10 +76,10 @@ def training():
         error = Evaluation.miscl_ratio(predict(X,W),targets)
         #print(error)
         errors.append(error)
+        acc.append(1-error)
     iterations = np.arange(epochs)
-    Evaluation.Plot_learning_curve("Error/iteration", iterations, errors)
-
-
+    Evaluation.Plot_learning_curve("Learning/iteration", iterations, acc)
+    Evaluation.Plot_error_curve("Error/iteration", iterations, errors)
         # p = W[0, :2]
         # k = -W[0, np.size(X, 0)-1] / p.dot(p.T)
         # l = np.sqrt(p.dot(p.T))
