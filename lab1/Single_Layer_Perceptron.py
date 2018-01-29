@@ -54,8 +54,9 @@ def training():
     eta = 0.0001
     errors = []
     acc=[]
-    patterns, targets = Data_Generation.generate_linearData()
-    #patterns, targets = Data_Generation.generate_nonlinearData()
+    N=100
+    patterns, targets = Data_Generation.generate_linearData(N)
+    #patterns, targets = Data_Generation.generate_nonlinearData(N)
     X = patterns
     # append bias
     #np.append(X, np.ones(1,np.size(X,1)))

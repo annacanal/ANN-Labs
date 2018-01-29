@@ -1,12 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def generate_linearData():
+def generate_linearData(N):
     mean_x = [-3, -3]
     mean_y = [3, 3]
     cov_x = [[1, 0], [0, 1]]
     cov_y = [[1, 0], [0, 1]]
-    N = 100
 
     x1, y1 = np.random.multivariate_normal(mean_x, cov_x, N).T
     x2, y2 = np.random.multivariate_normal(mean_y, cov_y, N).T
@@ -35,13 +34,12 @@ def generate_linearData():
     # plt.show()
     return patterns, target
 
-def generate_nonlinearData():
+def generate_nonlinearData(N):
     mean_x = [3, 3]
     mean_y = [1, 1]
     cov_x = [[1, 0], [0, 1]]
     cov_y = [[1, 0], [0, 1]]
-    N = 100
-
+ 
     x1, x2 = np.random.multivariate_normal(mean_x, cov_x, N).T
     y1, y2 = np.random.multivariate_normal(mean_y, cov_y, N).T
 

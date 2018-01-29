@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 import Data_Generation
 import Evaluation
 
-def W_init(X):
-    W = np.zeros([1, np.size(X, 0)])
+def W_init(nodes,input):
+    W = np.zeros([nodes, input])
     W = np.random.normal(0,0.001,W.shape)
-   # print(W)
     return W
 
 def phi(x):
@@ -53,8 +52,6 @@ def forward_pass(X,W,V):
     # Add bias to the new inputs for the next iteration
     bias = np.ones(np.size(H, 1))
     H = np.concatenate((H,[bias]),axis=0)
-    print(H.shape)
-    print(V.shape)
     O = phi(V.dot(H))
     return W,V,H,O
 
@@ -62,8 +59,6 @@ def backward_pass(X,W,V,H,O,T, n_nodes):
     deltaO = (O-T)*(phi_prime(O))
     deltaH = (V.T).dot(deltaO)*(phi_prime(H))
     deltaH = deltaH[:-1,:] #remove bias term
-    # print('ara')
-    #print(deltaH.shape)
     return deltaO, deltaH
 
 def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
@@ -73,17 +68,9 @@ def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     deltaV = eta*updateV
     return deltaW,deltaV
 
-def predict(X,W):
-    prediction = np.round(W.dot(X))
-    for i in range(len(prediction)):
-        if prediction[0,i]>0:
-            prediction[0,i]= 1.0
-        else:
-            prediction[0,i]= -1.0
-    return prediction
 
 def backforward_prop():
-    epochs = 200
+    epochs = 100
     n_nodes = [3,2]
     n_layers = 2
     eta = 0.1
@@ -91,11 +78,13 @@ def backforward_prop():
     deltaW = 0
     deltaV = 0
 
-    #patterns, targets = Data_Generation.generate_linearData()
-    patterns, targets = Data_Generation.generate_nonlinearData()
+    patterns, targets = Data_Generation.generate_linearData(100)
+    #patterns, targets = Data_Generation.generate_nonlinearData(100)
+
+    patterns_test, targets_test = Data_Generation.generate_linearData(50)
     X = patterns
-    W = W_init(X)
-    V = W_init(np.ones((2,200)))
+    W = W_init(n_nodes[0], np.size(X, 0))
+    V = W_init(n_nodes[1], n_nodes[0]+1)
     print(V.shape)
     errors_miscl=[]
     errors_mse=[]
