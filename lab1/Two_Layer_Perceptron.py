@@ -54,6 +54,7 @@ def backward_pass_general(outputs, weights, targets, n_layers):
 
 
 def backward_pass(X,V,W,H,O,T, n_nodes):
+    H = phi(V.dot(X))
     deltaO = (O-T).dot(phi_prime(O))
     deltaH= (V.T).dot(deltaO).dot(phi_prime(H))
     return deltaO, deltaH
