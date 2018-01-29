@@ -53,7 +53,7 @@ def forward_pass(X,W,V):
     bias = np.ones(np.size(H, 1))
     H = np.concatenate((H,[bias]),axis=0)
     O = phi(V.dot(H))
-    return W,V,H,O
+    return H,O
 
 def backward_pass(X,W,V,H,O,T, n_nodes):
     deltaO = (O-T)*(phi_prime(O))
@@ -69,38 +69,62 @@ def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     return deltaW,deltaV
 
 
+def predict(O, n_nodes):
+    pred = np.round(O)
+    prediction = np.zeros([1,np.size(O,1)])
+    for i in range(len(n_nodes)):
+        prediction = prediction + pred[i,:]
+    prediction = prediction/len(n_nodes)
+
+    for i in range(len(prediction)):
+        if prediction[0,i]>0:
+            prediction[0,i]= 1.0
+        else:
+            prediction[0,i]= -1.0
+    return prediction
+
+
 def backforward_prop():
-    epochs = 100
-    n_nodes = [3,2]
+    epochs = 50
+    n_nodes = [30,2]
     n_layers = 2
     eta = 0.1
     alpha= 0.9
     deltaW = 0
     deltaV = 0
+    #patterns, targets = Data_Generation.generate_linearData(100)
+    patterns, targets = Data_Generation.generate_nonlinearData(100)
 
-    patterns, targets = Data_Generation.generate_linearData(100)
-    #patterns, targets = Data_Generation.generate_nonlinearData(100)
-
-    patterns_test, targets_test = Data_Generation.generate_linearData(50)
+    patterns_test, targets_test = Data_Generation.generate_nonlinearData(50)
     X = patterns
+    X_test = patterns_test
     W = W_init(n_nodes[0], np.size(X, 0))
     V = W_init(n_nodes[1], n_nodes[0]+1)
-    print(V.shape)
     errors_miscl=[]
     errors_mse=[]
+    errors_mse_test=[]
+    errors_miscl_test=[]
     for i in range(epochs):
-        W, V, H, O = forward_pass(X, W,V)
+        H, O = forward_pass(X, W,V)
+        hhh, output_test = forward_pass(X_test, W, V)
         deltaO,deltaH = backward_pass(X,W,V,H,O,targets, n_nodes)
         deltaW,deltaV = weight_update(eta, deltaO,deltaH, X,H,alpha,deltaW,deltaV)
         W = W + deltaW
         V = V + deltaV
-        error_miscl = Evaluation.miscl_ratio(O, targets)
-        error_mse = Evaluation.mean_sq_error(O,targets)
-        # print(error)
-        #errors_miscl.append()
+        error_miscl = Evaluation.miscl_ratio(predict(O,n_nodes), targets)
+        error_mse = Evaluation.mean_sq_error(O, targets)
+        errors_miscl.append(error_miscl)
         errors_mse.append(error_mse)
+        error_mse_test = Evaluation.mean_sq_error(output_test, targets_test)
+        error_miscl_test = Evaluation.miscl_ratio(predict(output_test,n_nodes), targets_test)
+        errors_mse_test.append(error_mse_test)
+        errors_miscl_test.append(error_miscl_test)
+    H,output_test = forward_pass(X_test,W,V)
     iterations = np.arange(epochs)
-    Evaluation.Plot_error_curve("Error/iteration", iterations, errors_mse)
+    Evaluation.Plot_error_curve("MSE/iteration in learning", iterations, errors_mse)
+    Evaluation.Plot_error_curve("Missclassification/iteration in learning", iterations, errors_miscl)
+    Evaluation.Plot_error_curve("MSE/iteration in test", iterations, errors_mse_test)
+    Evaluation.Plot_error_curve("Missclassification/iteration in test", iterations, errors_miscl_test)
 
 # def autoencoder():        The encoder problem - needs the implementation of backprop.
     #Two layer perceptron: 8 input - 3 nodes - 8 outputs
