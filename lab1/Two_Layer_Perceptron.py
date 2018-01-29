@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 import Data_Generation
 import Evaluation
 
-def W_init(targets,X):
-    W = np.zeros([np.size(targets, 0), np.size(X, 0)])
+def W_init(X):
+    W = np.zeros([1, np.size(X, 0)])
     W = np.random.normal(0,0.001,W.shape)
+   # print(W)
     return W
 
 def phi(x):
@@ -32,18 +33,6 @@ def forward_pass_general(X, n_layers, n_nodes):
     outputs= new_inputs
     return outputs, weights
 
-def forward_pass(X, n_nodes):
-    V = W_init(n_nodes[0], X)
-    H = phi(V.dot(X))
-    # Add bias to the new inputs for the next iteration
-    bias = np.ones([1, np.size(H, 1)])
-    H = np.concatenate(H, [bias],axis=0)
-    W = W_init(n_nodes[1], H)
-    O = phi(W.dot(H))
-    return V,W,H,O
-
-
-
 def backward_pass_general(outputs, weights, targets, n_layers):
     #layers = len(outputs)-1
     delta = np.zeros(1,n_layers)
@@ -53,17 +42,32 @@ def backward_pass_general(outputs, weights, targets, n_layers):
     return delta
 
 
-def backward_pass(X,V,W,H,O,T, n_nodes):
-    H = phi(V.dot(X))
-    deltaO = (O-T).dot(phi_prime(O))
-    deltaH= (V.T).dot(deltaO).dot(phi_prime(H))
-    return deltaO, deltaH
-
 def weight_update_general(eta, delta, outputs, n_layers, alpha, dW, updateW):
     for layer in range(n_layers):
         dW[layer] = (alpha*dW[layer] ) - ( (delta[layer]).dot(outputs[layer].T)*(1 - alpha))
         updateW[layer] = eta*dW[layer]
     return updateW
+
+def forward_pass(X, n_nodes):
+    V = W_init(X)
+    H = phi(V.dot(X))
+    # Add bias to the new inputs for the next iteration
+    bias = np.ones(np.size(H, 1))
+    H = np.concatenate((H,[bias]),axis=0)
+    W = W_init(H)
+    O = phi(W.dot(H))
+    return V,W,H,O
+
+def backward_pass(X,V,W,H,O,T, n_nodes):
+    deltaO = (O-T)*(phi_prime(O))
+    H = H[:-1,:]
+    deltaH =np.dot(V.T,deltaO)*(phi_prime(H))
+    print(deltaH.shape)
+    deltaH = deltaH[:-1,:] #remove bias term
+    # print('ara')
+    print(deltaH.shape)
+    return deltaO, deltaH
+
 
 def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     updateW= (alpha*deltaW) - (deltaH.dot(X.T)*(1-alpha))
@@ -71,6 +75,15 @@ def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     deltaW = eta*updateW
     deltaV = eta*updateV
     return deltaW,deltaV
+
+def predict(X,W):
+    prediction = np.round(W.dot(X))
+    for i in range(len(prediction)):
+        if prediction[0,i]>0:
+            prediction[0,i]= 1.0
+        else:
+            prediction[0,i]= -1.0
+    return prediction
 
 def backforward_prop():
     epochs = 20
@@ -81,16 +94,21 @@ def backforward_prop():
     deltaW = 0
     deltaV = 0
     patterns, targets = Data_Generation.generate_linearData()
+    # patterns, targets = Data_Generation.generate_nonlinearData()
     X = patterns
-    outputs = []
+    errors=[]
     for i in range(epochs):
         V, W, H, O = forward_pass(X, n_nodes)
         deltaO,deltaH = backward_pass(X,V,W,H,O,targets, n_nodes)
         deltaW,deltaV = weight_update(eta, deltaO,deltaH, X,H,alpha,deltaW,deltaV)
-        W= W + deltaW
-        V= V+deltaV
-        print(Evaluation.mean_sq_error(outputs, targets))
-
+        W = W + deltaW
+        V= V + deltaV
+        #predict(V,X)
+        error = Evaluation.miscl_ratio(predict(H,W), targets)
+        # print(error)
+        errors.append(error)
+    iterations = np.arange(epochs)
+    Evaluation.Plot_learning_curve("Error/iteration", iterations, errors)
 
 # def autoencoder():        The encoder problem - needs the implementation of backprop.
     #Two layer perceptron: 8 input - 3 nodes - 8 outputs
@@ -99,3 +117,5 @@ def backforward_prop():
     # np.random.shuffle(X)
     # outputs, weights = forward_pass(X, 2, 3)
     # delta = backward_pass(outputs, weights, targets)
+
+backforward_prop()
