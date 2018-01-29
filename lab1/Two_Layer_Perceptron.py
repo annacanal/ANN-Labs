@@ -27,7 +27,7 @@ def forward_pass_general(X, n_layers, n_nodes):
         new_inputs[layer+1] = phi(weights[layer].dot(new_inputs[layer]))
         output = new_inputs[layer+1]
         # Add bias to the new inputs for the next iteration
-        bias = np.ones([1, np.size(new_inputs[layer+1], 1)])
+        bias = np.ones(np.size(new_inputs[layer+1], 1))
         new_inputs[layer + 1] = np.concatenate((new_inputs[layer+1], [bias]), axis=0)
     new_inputs[n_layers] = output
     outputs= new_inputs
@@ -35,7 +35,7 @@ def forward_pass_general(X, n_layers, n_nodes):
 
 def backward_pass_general(outputs, weights, targets, n_layers):
     #layers = len(outputs)-1
-    delta = np.zeros(1,n_layers)
+    delta = np.zeros(1,n_layers+1)
     delta[0] = (outputs[n_layers] - targets).dot(phi_prime((outputs[n_layers-1]).dot(weights[n_layers-1])))
     for i in range(1, n_layers):
         delta[i] = ((weights[n_layers-i].T).dot(delta[i-1])).dot(phi_prime((outputs[n_layers-i-1]).dot(weights[n_layers-i-1])))
@@ -49,25 +49,22 @@ def weight_update_general(eta, delta, outputs, n_layers, alpha, dW, updateW):
     return updateW
 
 def forward_pass(X, n_nodes):
-    V = W_init(X)
-    H = phi(V.dot(X))
+    W = W_init(X)
+    H = phi(W.dot(X))
     # Add bias to the new inputs for the next iteration
     bias = np.ones(np.size(H, 1))
     H = np.concatenate((H,[bias]),axis=0)
-    W = W_init(H)
-    O = phi(W.dot(H))
-    return V,W,H,O
+    V = W_init(H)
+    O = phi(V.dot(H))
+    return W,V,H,O
 
-def backward_pass(X,V,W,H,O,T, n_nodes):
+def backward_pass(X,W,V,H,O,T, n_nodes):
     deltaO = (O-T)*(phi_prime(O))
-    H = H[:-1,:]
-    deltaH =np.dot(V.T,deltaO)*(phi_prime(H))
-    print(deltaH.shape)
+    deltaH = (V.T).dot(deltaO)*(phi_prime(H))
     deltaH = deltaH[:-1,:] #remove bias term
     # print('ara')
-    print(deltaH.shape)
+    #print(deltaH.shape)
     return deltaO, deltaH
-
 
 def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     updateW= (alpha*deltaW) - (deltaH.dot(X.T)*(1-alpha))
@@ -87,7 +84,7 @@ def predict(X,W):
 
 def backforward_prop():
     epochs = 20
-    n_nodes = [3,2]
+    n_nodes = [7,7]
     n_layers = 2
     eta = 0.001
     alpha= 0.9
@@ -98,13 +95,13 @@ def backforward_prop():
     X = patterns
     errors=[]
     for i in range(epochs):
-        V, W, H, O = forward_pass(X, n_nodes)
-        deltaO,deltaH = backward_pass(X,V,W,H,O,targets, n_nodes)
+        W, V, H, O = forward_pass(X, n_nodes)
+        deltaO,deltaH = backward_pass(X,W,V,H,O,targets, n_nodes)
         deltaW,deltaV = weight_update(eta, deltaO,deltaH, X,H,alpha,deltaW,deltaV)
         W = W + deltaW
-        V= V + deltaV
+        V = V + deltaV
         #predict(V,X)
-        error = Evaluation.miscl_ratio(predict(H,W), targets)
+        error = Evaluation.miscl_ratio(predict(X.dot(W),V), targets)
         # print(error)
         errors.append(error)
     iterations = np.arange(epochs)
