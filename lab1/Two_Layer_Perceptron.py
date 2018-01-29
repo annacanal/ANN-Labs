@@ -48,13 +48,13 @@ def weight_update_general(eta, delta, outputs, n_layers, alpha, dW, updateW):
         updateW[layer] = eta*dW[layer]
     return updateW
 
-def forward_pass(X, n_nodes):
-    W = W_init(X)
+def forward_pass(X,W,V):
     H = phi(W.dot(X))
     # Add bias to the new inputs for the next iteration
     bias = np.ones(np.size(H, 1))
     H = np.concatenate((H,[bias]),axis=0)
-    V = W_init(H)
+    print(H.shape)
+    print(V.shape)
     O = phi(V.dot(H))
     return W,V,H,O
 
@@ -83,29 +83,35 @@ def predict(X,W):
     return prediction
 
 def backforward_prop():
-    epochs = 20
-    n_nodes = [7,7]
+    epochs = 200
+    n_nodes = [3,2]
     n_layers = 2
-    eta = 0.001
+    eta = 0.1
     alpha= 0.9
     deltaW = 0
     deltaV = 0
-    patterns, targets = Data_Generation.generate_linearData()
-    # patterns, targets = Data_Generation.generate_nonlinearData()
+
+    #patterns, targets = Data_Generation.generate_linearData()
+    patterns, targets = Data_Generation.generate_nonlinearData()
     X = patterns
-    errors=[]
+    W = W_init(X)
+    V = W_init(np.ones((2,200)))
+    print(V.shape)
+    errors_miscl=[]
+    errors_mse=[]
     for i in range(epochs):
-        W, V, H, O = forward_pass(X, n_nodes)
+        W, V, H, O = forward_pass(X, W,V)
         deltaO,deltaH = backward_pass(X,W,V,H,O,targets, n_nodes)
         deltaW,deltaV = weight_update(eta, deltaO,deltaH, X,H,alpha,deltaW,deltaV)
         W = W + deltaW
         V = V + deltaV
-        #predict(V,X)
-        error = Evaluation.miscl_ratio(predict(X.dot(W),V), targets)
+        error_miscl = Evaluation.miscl_ratio(O, targets)
+        error_mse = Evaluation.mean_sq_error(O,targets)
         # print(error)
-        errors.append(error)
+        #errors_miscl.append()
+        errors_mse.append(error_mse)
     iterations = np.arange(epochs)
-    Evaluation.Plot_learning_curve("Error/iteration", iterations, errors)
+    Evaluation.Plot_error_curve("Error/iteration", iterations, errors_mse)
 
 # def autoencoder():        The encoder problem - needs the implementation of backprop.
     #Two layer perceptron: 8 input - 3 nodes - 8 outputs
