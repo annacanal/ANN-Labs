@@ -9,10 +9,13 @@ def mean_sq_error(outputs, targets):
 def miscl_ratio(outputs, targets):
     miscl = 0
     for i,x in enumerate(targets):
-        if (x != outputs[i]):
+        if (x != outputs[0,i]):
             miscl += 1
     ratio = miscl/np.size(targets)
     return ratio
 
-def Plot_learning_curve(ratio):
-    return 0
+#Plot the error in each iteration.
+def Plot_learning_curve(name,iterations,errors):
+    plt.title(name)
+    plt.plot(iterations, errors,'blue')
+    plt.show()
