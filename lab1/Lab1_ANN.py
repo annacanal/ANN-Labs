@@ -122,7 +122,7 @@ def phi_prime(phi):
     phi_prime = (1+phi)*(1- phi)/2.0
     return phi_prime
 
-def forward_pass(X, n_layers, n_nodes):
+def forward_pass_general(X, n_layers, n_nodes):
     weights = [n_layers]
     new_inputs = [n_layers+1]
     new_inputs[0] = X
@@ -137,8 +137,19 @@ def forward_pass(X, n_layers, n_nodes):
     outputs= new_inputs
     return outputs, weights
 
+def forward_pass(X, n_layers, n_nodes):
+    V = W_init(n_nodes[0], X)
+    H = phi(V.dot(X))
+    # Add bias to the new inputs for the next iteration
+    bias = np.ones([1, np.size(H, 1)])
+    H = np.concatenate(H, [bias],axis=0)
+    W = W_init(n_nodes[1], H)
+    O = phi(W.dot(H))
+    return V,W,H,O
 
-def backward_pass(outputs, weights, targets, n_layers):
+
+
+def backward_pass_general(outputs, weights, targets, n_layers):
     #layers = len(outputs)-1
     delta = np.zeros(1,n_layers)
     delta[0] = (outputs[n_layers] - targets).dot(phi_prime((outputs[n_layers-1]).dot(weights[n_layers-1])))
@@ -147,7 +158,7 @@ def backward_pass(outputs, weights, targets, n_layers):
     return delta
 
 
-def weight_update(eta, delta, outputs, n_layers, alpha, dW, updateW):
+def weight_update_general(eta, delta, outputs, n_layers, alpha, dW, updateW):
     for layer in range(n_layers):
         dW[layer] = (alpha*dW[layer] ) - ( (delta[layer]).dot(outputs[layer].T)*(1 - alpha))
         updateW[layer] = eta*dW[layer]
