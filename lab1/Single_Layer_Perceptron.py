@@ -16,11 +16,10 @@ def perceptron_learning_batch(eta,T, X, W):
 #         delta_W = nu/len(T)*np.dot((T-Y),X.T)
 #         W = W+delta_W
 #     return W
-def perceptron_learning_sequential(eta, X, T, W):
+def perceptron_learning_sequential(eta, T, X, W):
     for i in range(len(T)):
-        if(((np.dot(W,X[:,i])>0) and (T[i] < 0)) or ((np.dot(W,X[:,i])<0) and (T[i] > 0))):
-            deltaW = eta*T[i]*X[:,i]
-            W = W+deltaW
+        deltaW = eta * (T[i] - np.dot(W, X[:, i])) * X[:, i]
+        W = W + deltaW
     return W
 
 def delta_rule_batch(eta,T, X, W):
@@ -31,8 +30,7 @@ def delta_rule_batch(eta,T, X, W):
 
 def delta_rule_sequential(eta, T, X, W):
     for i in range(len(T)):
-        xx = X[:,i].reshape(-1,1)
-        DeltaW = - eta * (W.dot(X[:,i])- T[i]).dot(xx.T)
+        DeltaW = - eta * (W.dot(X[:,i])- T[i])*X[:,i]
         W = W + DeltaW
     return W
 
@@ -62,17 +60,19 @@ def training():
     # append bias
     #np.append(X, np.ones(1,np.size(X,1)))
     W = W_init(X)
-    type = 'Delta_batch'
+    type = 'Perceptron_sequential'
     for i in range(epochs):
         if type == 'Perceptron_batch':
             updateW = perceptron_learning_batch(eta,targets, X,W)
+            W = W + updateW
         if type == 'Perceptron_sequential':
-            updateW = perceptron_learning_sequential(eta, targets, X, W)
+            W = perceptron_learning_sequential(eta, targets, X, W)
         if type == 'Delta_batch':
             updateW = delta_rule_batch(eta, targets, X, W)
+            W = W + updateW
         if type == 'Delta_sequential':
-            updateW = delta_rule_sequential(eta, targets, X, W)
-        W = W + updateW
+            W = delta_rule_sequential(eta, targets, X, W)
+
         error = Evaluation.miscl_ratio(predict(X,W),targets)
         #print(error)
         errors.append(error)
