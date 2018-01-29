@@ -4,27 +4,31 @@ from mpl_toolkits.mplot3d import Axes3D
 from Two_Layer_Func_Approx import backforward_prop
 
 def approx_function():
-    x = np.arange(-1, 1, 0.5)
-    y = np.arange(-1, 1, 0.5)
+    x = np.arange(-5, 5.5, 0.5)
+    y = np.arange(-5, 5.5, 0.5)
     N = len(x)*len(y)
-    z = np.exp((np.outer(x,x)+np.outer(y,y))/10) - 0.5
+    # for i in range(len(x)):
+        
+    z = np.exp(-(np.outer(x,x)+np.outer(y,y))/10) - 0.5
     xx, yy = np.meshgrid(x, y)
-    # print(len(x))
+    # print(xx)
+
     #targets and patterns for training:
     targets = z.reshape(1, N)
     targets = targets.flatten()
-    bias = np.ones(N)
-    patterns = np.concatenate((xx.reshape(1, N), yy.reshape(1, N), [bias]), axis=0)
+    # bias = np.ones(N) 
+    patterns = np.concatenate((xx.reshape(1, N), yy.reshape(1, N)), axis=0)
     n_nodes = [3, 2]
-    backforward_prop(patterns, targets, n_nodes)
+
+    #training with patterns and targets: 
+
+    # backforward_prop(patterns, targets, n_nodes)
+    
     #Visualising data: 
     # fig = plt.figure()
     # ax = fig.gca(projection='3d')
     # surf = ax.plot_surface(xx, yy, z)
     # plt.show()
-
-    #training with patterns and targets: 
-
 
     #Through forward pass get out with "approx function"s patterns as input:
     # n_nodes = 2 #Try for different number of nodes
