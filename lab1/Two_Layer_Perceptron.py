@@ -53,8 +53,8 @@ def forward_pass(X,W,V):
     # Add bias to the new inputs for the next iteration
     bias = np.ones(np.size(H, 1))
     H = np.concatenate((H,[bias]),axis=0)
-    print(H.shape)
-    print(V.shape)
+    # print(H.shape)
+    # print(V.shape)
     O = phi(V.dot(H))
     return W,V,H,O
 
@@ -120,5 +120,8 @@ def backforward_prop():
     # np.random.shuffle(X)
     # outputs, weights = forward_pass(X, 2, 3)
     # delta = backward_pass(outputs, weights, targets)
+def main():
+    backforward_prop()
 
-backforward_prop()
+if __name__ == "__main__":
+    main()
