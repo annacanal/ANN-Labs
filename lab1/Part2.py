@@ -24,8 +24,8 @@ xtest = x[30:,:]
 ytesttrue = y[30:]
 
 nn = MLPRegressor(
-    hidden_layer_sizes=(5,1),  activation='logistic', solver='sgd',# alpha=0.001, batch_size='auto',
-    learning_rate='constant', learning_rate_init=0.1, power_t=0.5, max_iter=10000, shuffle=True,
+    hidden_layer_sizes=(7,4),  activation='logistic', solver='sgd',# alpha=0.001, batch_size='auto',
+    learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=100000, #shuffle=True,
     random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
     early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 
@@ -35,11 +35,19 @@ print(Evaluation.mean_sq_error(ytest, ytesttrue))
 
 
 yplot = np.hstack((ytrain,ytest))
+xplot = np.vstack((xtrain, xtest))
+
+predictionplot = []
+for j,elem in enumerate(xplot):
+    predictionplot = np.hstack((predictionplot, elem))
+    predictionplot = np.hstack((predictionplot, yplot[j]))
+
 yi = i[5::6]
 
 #in order to plot the output
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 ax1.plot(i, datapoints)#, s=1, c='b', marker="s", label='real')
-ax1.plot(yi,yplot)#, s=10, c='r', marker="o", label='NN Prediction')
+ax1.plot(i, predictionplot)
+#ax1.plot(yi,yplot)#, s=10, c='r', marker="o", label='NN Prediction')
 plt.show()
