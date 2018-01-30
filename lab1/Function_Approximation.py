@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from Two_Layer_Func_Approx import backforward_prop
+# from Two_Layer_Func_Approx import backforward_prop
 import Two_Layer_Perceptron
 import Evaluation
 import math
@@ -19,7 +19,7 @@ def approx_function():
     # Visualising data:
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    print(zz.shape)
+    # print(zz.shape)
     surf = ax.plot_surface(xx, yy, zz,cmap=plt.cm.BuGn, linewidth=0 )
     plt.title('Function to approximate')
     plt.show()
@@ -29,16 +29,16 @@ def approx_function():
     plt.plot(zz)
     plt.show()
 
-    return patterns,targets,n_nodes,xx,yy,X
+    return patterns, targets, n_nodes, xx, yy, X
 
 def average_output(output, n_nodes):
-    output_averaged= 0
+    output_averaged = 0
     for i in range(len(n_nodes)):
         output_averaged = output_averaged + output[i,:]
     output_averaged = output_averaged/len(n_nodes)
     return output_averaged
 
-def backforward_prop(patterns_train, targets_train, n_nodes,xx_train,yy_train,X):
+def backforward_prop(patterns_train, targets_train, n_nodes, xx_train, yy_train, X):
     epochs = 10000
     eta = 0.1
     alpha = 0.9
@@ -74,7 +74,7 @@ def backforward_prop(patterns_train, targets_train, n_nodes,xx_train,yy_train,X)
     # Extra for function approximation:
     gridsize = X.shape[0]
     output = average_output(O, n_nodes)
-    print(output)
+    # print(output)
     zz = np.reshape(output,(gridsize, gridsize))
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -89,8 +89,8 @@ def backforward_prop(patterns_train, targets_train, n_nodes,xx_train,yy_train,X)
     # Evaluation.Plot_error_curve("Missclassification/iteration in learning", iterations, errors_miscl)
 
 def main():
-    patterns, targets, n_nodes, xx,yy,X= approx_function()
-    backforward_prop(patterns,targets,n_nodes,xx,yy,X)
+    patterns, targets, n_nodes, xx, yy, X = approx_function()
+    backforward_prop(patterns, targets, n_nodes, xx, yy, X)
 
 
 if __name__ == "__main__":
