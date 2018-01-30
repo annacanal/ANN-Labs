@@ -18,10 +18,15 @@ def miscl_ratio(outputs, targets):
 def Plot_error_curve(name,iterations,errors):
     plt.title(name)
     plt.plot(iterations, errors,'blue')
+    plt.xlabel('Epochs')
+    plt.ylabel('Error')
     plt.show()
 
 #Plot the learning in each iteration.
 def Plot_learning_curve(name,iterations,acc):
     plt.title(name)
     plt.plot(iterations, acc,'blue')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
     plt.show()
+
