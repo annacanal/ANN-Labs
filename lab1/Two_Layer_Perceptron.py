@@ -135,6 +135,5 @@ def backforward_prop():
     # delta = backward_pass(outputs, weights, targets)
 def main():
     backforward_prop()
-
 if __name__ == "__main__":
     main()
