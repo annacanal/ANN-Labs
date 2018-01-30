@@ -12,7 +12,12 @@ def MackeyGlass(tau, beta, gamma, tmax):
             dataset[t] = dataset[t-1] + ( beta * dataset[t-1-tau] ) / (1 + (dataset[t-1-tau]) ** 10) - gamma * dataset[t-1]
     return dataset
 
+def main():
+    plt.plot(MackeyGlass(25, 0.2, 0.1, 1200))
+    plt.show()
+    #print(MackeyGlass(25, 0.2, 0.1, 200))
 
-plt.plot(MackeyGlass(25, 0.2, 0.1, 1200))
-plt.show()
-#print(MackeyGlass(25, 0.2, 0.1, 200))
+
+
+if __name__ == "__main__":
+    main()
