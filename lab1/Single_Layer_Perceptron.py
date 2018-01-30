@@ -10,12 +10,6 @@ def perceptron_learning_batch(eta,T, X, W):
     DeltaW = eta * (T-Y).dot((X).T)
     return DeltaW
 
-# def perceptron_rule_batch(X, T, W, nu, epochs):
-#     for _ in range(epochs):
-#         Y = predict(X,W)
-#         delta_W = nu/len(T)*np.dot((T-Y),X.T)
-#         W = W+delta_W
-#     return W
 def perceptron_learning_sequential(eta, T, X, W):
     for i in range(len(T)):
         deltaW = eta * (T[i] - np.dot(W, X[:, i])) * X[:, i]
@@ -26,7 +20,6 @@ def delta_rule_batch(eta,T, X, W):
     #DeltaW = -eta * (W.dot(X) - T).dot(X.T)
     DeltaW = - eta * (np.subtract(W.dot(X), T)).dot(X.T)
     return DeltaW
-#DeltaW = -eta * (np.substract(W.dot(X[:,i]),T[i])).dot(X[:,i].T)
 
 def delta_rule_sequential(eta, T, X, W):
     for i in range(len(T)):
@@ -49,22 +42,21 @@ def predict(X,W):
             prediction[0,i]= -1.0
     return prediction
 
-def training():
+def training(types):
     epochs = 20
     eta = 0.0001
     errors = []
     acc=[]
-    N=100
-    patterns, targets = Data_Generation.generate_linearData(N)
-    #patterns, targets = Data_Generation.generate_nonlinearData(N)
+    patterns, targets = Data_Generation.generate_linearData(100)
+    #patterns, targets = Data_Generation.generate_nonlinearData(100)
     X = patterns
     # append bias
     #np.append(X, np.ones(1,np.size(X,1)))
     W = W_init(X)
-    type = 'Perceptron_sequential'
+    type = types
     for i in range(epochs):
         if type == 'Perceptron_batch':
-            updateW = perceptron_learning_batch(eta,targets, X,W)
+            updateW = perceptron_learning_batch(eta, targets, X, W)
             W = W + updateW
         if type == 'Perceptron_sequential':
             W = perceptron_learning_sequential(eta, targets, X, W)
@@ -79,8 +71,10 @@ def training():
         errors.append(error)
         acc.append(1-error)
     iterations = np.arange(epochs)
-    Evaluation.Plot_learning_curve("Learning/iteration", iterations, acc)
-    Evaluation.Plot_error_curve("Error/iteration", iterations, errors)
+    # Evaluation.Plot_learning_curve("Learning/iteration "+type+' non-linear data', iterations, acc)
+    # Evaluation.Plot_error_curve("Error/iteration "+type+' non-linear data', iterations, errors)
+    return iterations, acc,errors
+
         # p = W[0, :2]
         # k = -W[0, np.size(X, 0)-1] / p.dot(p.T)
         # l = np.sqrt(p.dot(p.T))
@@ -96,4 +90,57 @@ def training():
     #plt.show()
 
 
-training()
+
+def main():
+    types1 = ['Perceptron_batch','Perceptron_sequential']
+    types2 = ['Delta_batch', 'Delta_sequential']
+    errors1 =[]
+    accs1 =[]
+    errors2 =[]
+    accs2 =[]
+    for i in range(len(types1)):
+        iterations, acc, error =training(types1[i])
+        accs1.append(acc)
+        errors1.append(error)
+
+    for i in range(len(types1)):
+        name ="Learning/iteration linear data"
+        plt.title(name)
+        plt.plot(iterations, accs1[i], label= types1[i])
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
+
+    for i in range(len(types1)):
+        name= "Error/iteration linear data"
+        plt.title(name)
+        plt.plot(iterations, errors1[i], label= types1[i])
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
+    for i in range(len(types2)):
+        iterations, acc, error= training(types2[i])
+        accs2.append(acc)
+        errors2.append(error)
+
+    for i in range(len(types2)):
+        name ="Learning/iteration linear data"
+        plt.title(name)
+        plt.plot(iterations, accs2[i], label= types2[i])
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
+
+    for i in range(len(types2)):
+        name= "Error/iteration linear data"
+        plt.title(name)
+        plt.plot(iterations, errors2[i], label= types2[i])
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
+if __name__ == "__main__":
+    main()
