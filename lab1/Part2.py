@@ -24,7 +24,7 @@ xtest = x[30:,:]
 ytesttrue = y[30:]
 
 nn = MLPRegressor(
-    hidden_layer_sizes=(5,1),  activation='logistic', solver='sgd', alpha=0.001, #batch_size='auto',
+    hidden_layer_sizes=(5,2),  activation='logistic', solver='sgd', alpha=0.001, #batch_size='auto',
     learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=100000, #shuffle=True,
     random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
     early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
