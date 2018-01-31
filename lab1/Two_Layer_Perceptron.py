@@ -69,13 +69,8 @@ def weight_update(eta, deltaO, deltaH,X,H, alpha, deltaW,deltaV):
     return deltaW,deltaV
 
 
-def predict(O, n_nodes):
-    pred = np.round(O)
-    prediction = np.zeros([1,np.size(O,1)])
-    for i in range(len(n_nodes)):
-        prediction = prediction + pred[i,:]
-    prediction = prediction/len(n_nodes)
-
+def predict(O):
+    prediction = np.round(O)
     for i in range(len(prediction)):
         if prediction[0,i]>0:
             prediction[0,i]= 1.0
@@ -84,11 +79,11 @@ def predict(O, n_nodes):
     return prediction
 
 
-def backforward_prop():
-    epochs = 50
-    n_nodes = [30,2]
+def backforward_prop(nodes):
+    epochs = 1000
+    n_nodes = [nodes,1]
     n_layers = 2
-    eta = 0.1
+    eta = 0.01
     alpha= 0.9
     deltaW = 0
     deltaV = 0
@@ -111,29 +106,45 @@ def backforward_prop():
         deltaW,deltaV = weight_update(eta, deltaO,deltaH, X,H,alpha,deltaW,deltaV)
         W = W + deltaW
         V = V + deltaV
-        error_miscl = Evaluation.miscl_ratio(predict(O,n_nodes), targets)
+        # error_miscl = Evaluation.miscl_ratio(predict(O), targets)
         error_mse = Evaluation.mean_sq_error(O, targets)
-        errors_miscl.append(error_miscl)
+        # errors_miscl.append(error_miscl)
         errors_mse.append(error_mse)
         error_mse_test = Evaluation.mean_sq_error(output_test, targets_test)
-        error_miscl_test = Evaluation.miscl_ratio(predict(output_test,n_nodes), targets_test)
+        # error_miscl_test = Evaluation.miscl_ratio(predict(output_test), targets_test)
         errors_mse_test.append(error_mse_test)
-        errors_miscl_test.append(error_miscl_test)
-    H,output_test = forward_pass(X_test,W,V)
+        # errors_miscl_test.append(error_miscl_test)
     iterations = np.arange(epochs)
-    Evaluation.Plot_error_curve("MSE/iteration in learning", iterations, errors_mse)
-    Evaluation.Plot_error_curve("Missclassification/iteration in learning", iterations, errors_miscl)
-    Evaluation.Plot_error_curve("MSE/iteration in test", iterations, errors_mse_test)
-    Evaluation.Plot_error_curve("Missclassification/iteration in test", iterations, errors_miscl_test)
 
-# def autoencoder():        The encoder problem - needs the implementation of backprop.
-    #Two layer perceptron: 8 input - 3 nodes - 8 outputs
-    #Only one node is active: [-1 -1 -1 1 -1 -1 -1 -1]: 1 = active and -1 = nonactive
-    # X = np.array([1, -1, -1, -1, -1, -1, -1, -1]).T
-    # np.random.shuffle(X)
-    # outputs, weights = forward_pass(X, 2, 3)
-    # delta = backward_pass(outputs, weights, targets)
+    return errors_mse,errors_mse_test,iterations
+
+
 def main():
-    backforward_prop()
+    n_nodes = [2,5,10,25]
+    errors_learning =[]
+    errors_test =[]
+
+    for i in range(len(n_nodes)):
+        error_learning, error_test,iterations =backforward_prop(n_nodes[i])
+        errors_learning.append(error_learning)
+        errors_test.append(error_test)
+
+    for i in range(len(n_nodes)):
+        name ="MSE/iteration in learning"
+        plt.title(name)
+        plt.plot(iterations, errors_learning[i], label= "Nodes = "+str(n_nodes[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
+
+    for i in range(len(n_nodes)):
+        name= "MSE/iteration in test"
+        plt.title(name)
+        plt.plot(iterations, errors_test[i], label= "Nodes = "+str(n_nodes[i]))
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+    plt.show()
 if __name__ == "__main__":
     main()
