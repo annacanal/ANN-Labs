@@ -4,22 +4,20 @@ import matplotlib.pyplot as plt
 import Mackey_Glass_Datapoints
 import Evaluation
 
-def regression_evaluation(n_nodes, xtrain, ytrain, xtest, ytesttrue):
-    error_mse = np.zeros(10)
-    error_mse_test = np.zeros(10)
-    for i in range(10):
+def regression_evaluation(n_nodes, xtrain, ytrain, xtest, ytesttrue, alpha_list):
+    error_mse_test = np.zeros(len(alpha_list))
+    for i in range(len(alpha_list)):
         nn = MLPRegressor(
-        hidden_layer_sizes=(n_nodes,1),  activation='logistic', solver='sgd', alpha=0.01, #batch_size='auto',
+        hidden_layer_sizes=(n_nodes,),  activation='logistic', solver='sgd', alpha=alpha_list[i], #batch_size='auto',
         learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=100000, #shuffle=True,
         random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
         early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
         n = nn.fit(xtrain, ytrain)
-        ytrain = nn.predict(xtrain) 
+        # ytrain = nn.predict(xtrain) 
         ytest = nn.predict(xtest)
-        error_mse[i] = Evaluation.mean_sq_error(ytrain, ytesttrue)
+        # error_mse = Evaluation.mean_sq_error(ytrain, ytesttrue)
         error_mse_test[i] = Evaluation.mean_sq_error(ytest, ytesttrue)
-        iterations = np.arange(10)
-    return error_mse_test, iterations
+    return error_mse_test
 
 def main():
     i = np.arange(301, 1500, 5)
@@ -36,15 +34,15 @@ def main():
 
     #xtrain = x[:,:30]
     xtrain = x[:10,:]
-    # print(xtrain.shape)
+    # print(xtrain)
     ytrain = y[:10]
-    # print(ytrain.shape)
+    # print(ytrain)
     # print(ytrain)
     #xtest = x[:,31:]
-    xtest = x[30:,:]
-    # print(xtest.shape)
+    xtest = x[20:30,:]
+    print(xtest)
     ytesttrue = y[30:]
-    # print(ytesttrue.shape)
+    # print(ytesttrue)
 
     # print(ytesttrue)
 
@@ -54,15 +52,16 @@ def main():
 #     random_state=9, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
 #     early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     n_nodes = np.array([2, 5, 10, 25])
+    alpha_list = np.linspace(0.001, 0.1, 10)
     errors_learning = []
     errors_test = []
 
     for i in range(len(n_nodes)):
-        error_test, iterations = regression_evaluation(n_nodes[i], xtrain, ytrain, xtest, ytesttrue)
+        error_test = regression_evaluation(n_nodes[i], xtrain, ytrain, xtest, ytesttrue, alpha_list)
         # errors_learning.append(error_learning)
         errors_test.append(error_test)
-    print(errors_test[1])
-    print(iterations)
+    # print('nodes = ', n_nodes[i])
+    # print(errors_test)
 
     # for i in range(len(n_nodes)):
     #     name ="MSE/iteration in learning"
@@ -76,16 +75,12 @@ def main():
     for i in range(len(n_nodes)):
         name= "MSE/iteration in test"
         plt.title(name)
-        plt.plot(iterations, errors_test[i], label= "Nodes = "+str(n_nodes[i]))
-        plt.xlabel('Epochs')
-        plt.ylabel('Error')
+        plt.plot(alpha_list, errors_test[i], label= "Nodes = "+str(n_nodes[i]))
+        plt.xlabel('Alphas')
+        plt.ylabel('Error_mse')
         plt.legend()
     plt.show()
 
-
-
-
-    
     # n = nn.fit(xtrain, ytrain)
     # ytest = nn.predict(xtest)
 
