@@ -11,6 +11,7 @@ def possible_inputs(num_of_combinations):
     return inputs
 
 
+
 def encoder_miscl_ratio(outputs, targets):
     miscl = 0
     outputs_r = np.round(outputs)
@@ -30,8 +31,6 @@ def backforward_prop(patterns, targets, n_nodes):
     X = patterns
     W = Two_Layer_Perceptron.W_init(n_nodes[0], np.size(X, 0))
     V = Two_Layer_Perceptron.W_init(n_nodes[1], n_nodes[0]+1)
-    print(X)
-    print()
 
     errors_miscl=[]
     errors_mse=[]
@@ -48,9 +47,11 @@ def backforward_prop(patterns, targets, n_nodes):
         errors_miscl.append(error_miscl)
         errors_mse.append(error_mse)
     iterations = np.arange(epochs)
+    print(W, 'this is W')
+    print(V, 'this is V')
 
-    print(np.round(O))
-    print()
+    # print(np.round(O))
+    # print()
     Evaluation.Plot_error_curve("MSE/iteration in learning", iterations, errors_mse)
     Evaluation.Plot_error_curve("Missclassification/iteration in learning", iterations, errors_miscl)
 

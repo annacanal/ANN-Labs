@@ -115,6 +115,8 @@ def backforward_prop(nodes):
         errors_mse_test.append(error_mse_test)
         # errors_miscl_test.append(error_miscl_test)
     iterations = np.arange(epochs)
+    print(W)
+    print(V)
 
     return errors_mse,errors_mse_test,iterations
 

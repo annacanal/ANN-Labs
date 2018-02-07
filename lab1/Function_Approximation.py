@@ -6,11 +6,11 @@ import Evaluation
 import math
 
 def approx_function():
-    X = np.arange(-5, 5, 0.5).T
+    X = np.arange(-5, 5, 0.5).T #20 values
     Y = np.arange(-5, 5, 0.5).T
     xx, yy = np.meshgrid(X,Y)
-    zz = np.exp(-(xx *xx*0.1))*np.exp(-(yy *yy * 0.1)) - 0.5
-    N = X.shape[0]*Y.shape[0]
+    zz = np.exp(-(xx *xx*0.1))*np.exp(-(yy *yy * 0.1)) - 0.5    #shape (20,20)
+    N = X.shape[0]*Y.shape[0] # = 400
 
 
     bias = np.ones((1,N))
@@ -26,13 +26,13 @@ def approx_function():
 
     return patterns,targets,xx,yy,X
 
-
+#Why training on small amount of data 25, and test on 375? Shouldn't it be the other way around?
 
 def split_train_test(patterns,targets, n_split):
-    patterns_train = patterns[:,:n_split]
-    patterns_test= patterns[:,n_split:patterns.shape[1]]
-    targets_train = targets[:,:n_split]
-    targets_test = targets[:,n_split:patterns.shape[1]]
+    patterns_train = patterns[:,:n_split]                   #shape is (3,25)
+    patterns_test= patterns[:,n_split:patterns.shape[1]]    #shape is (3,375)
+    targets_train = targets[:,:n_split]                     #shape is (1,25)
+    targets_test = targets[:,n_split:patterns.shape[1]]     #shape is (1,375)
     return patterns_train, patterns_test, targets_train, targets_test
 
 def backforward_prop(patterns, targets, nodes,xx_train,yy_train,X):
@@ -96,6 +96,7 @@ def main():
         error_learning, error_test, iterations,N_split = backforward_prop(patterns,targets,n_nodes[i],xx,yy,X)
         errors_learning.append(error_learning)
         errors_test.append(error_test)
+
     for i in range(len(n_nodes)):
         name = "MSE/iteration in learning with n= " +str(N_split)
         plt.title(name)

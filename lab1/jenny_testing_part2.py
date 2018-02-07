@@ -22,21 +22,21 @@ def main():
     for k in range(1, int(np.size(datapoints)/6)):
         x = np.vstack((x, datapoints[(k*6):(k*6+5)]))
 
-    xtrain = x[:24,:]
+    xtrain = x[:25,:]
     # print(xtrain, 'this is xtrain')
-    ytrain = y[:24]
+    ytrain = y[:25]
     # print(ytrain)
-    xval = x[24:32:]
+    xval = x[25:30:]
     # print(xval, 'this is xval')
-    yval = y[24:32]
+    yval = y[25:30]
     # print(ytrain)
-    xtest = x[32:40,:]
+    xtest = x[30:40,:]
     # print(xtest, 'this is xtest')
-    ytesttrue = y[32:]
+    ytesttrue = y[30:]
     # print(ytesttrue)
 
     n_nodes = np.array([2, 3, 5, 6, 7])
-    alpha_list = np.linspace(0.001, 0.1, 8)
+    alpha_list = np.linspace(0.001, 0.1, 5)
     errors_val = []
 
 # Task 4.3.1_3 (Question 3) - training and then decide best model from validation set: 
@@ -60,15 +60,15 @@ def main():
     best_node = 2
     best_alpha = 0.001
     y_predicted = regression_evaluation(best_node, xtrain, ytrain, xtest, best_alpha)
-    error_val = Evaluation.mean_sq_error(y_predicted, yval)
-    print(error_val)
+    
+    
 
-    # name= "Test set"
-    # plt.title(name)
-    # plt.plot(xtest, errors_val[i])
-    # plt.xlabel('xtest')
-    # plt.ylabel('Error_mse')
-    # plt.legend()
+
+    # fig = plt.figure()
+    # ax1 = fig.add_subplot(111)
+    # ax1.plot(i, datapoints)#, s=1, c='b', marker="s", label='real')
+    # ax1.plot(i, predictionplot)
+    # #ax1.plot(yi,yplot)#, s=10, c='r', marker="o", label='NN Prediction')
     # plt.show()
 
 if __name__ == "__main__":
