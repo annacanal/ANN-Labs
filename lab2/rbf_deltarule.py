@@ -44,16 +44,16 @@ def main():
     mu = np.array([0.3, 0.01, 0.5])
     sigma = np.array([0.5, 10, 1])
     weights = weights_init(mu)
+    type='sin'
 
-    for i in range(len(target_1)):
+    for i in range(len(train)):
         phi = phi_vector(train, mu, sigma)
         error1 = error_function(target_1, phi, weights)
-        deltaW = eta * error * phi
-        weights = weights + deltaW
-
-    for i in range(len(target_2)):
-        phi = phi_vector(train, mu, sigma)
         error2 = error_function(target_2, phi, weights)
+        if type == 'sin':
+            error = error1
+        if type == 'square':
+            error = error2   
         deltaW = eta * error * phi
         weights = weights + deltaW
 
