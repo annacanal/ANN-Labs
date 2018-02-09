@@ -93,14 +93,16 @@ def main():
 #           Training
     phi = phi_matrix(train, mu, sigma)
     weights = weight_update_batch(phi, target_1)
-    f = f_function(train, mu, sigma, weights)
-    error = error_mean_square(f, target_1)
-    print(error)
+    output_train = f_function(train, mu, sigma, weights)
+    error_train = error_mean_square(output_train, target_1)
+    print(error_train, ': Error train')
 
 #           Testing
-    f = f_function(test,mu,sigma,weights)
-    error = error_mean_square(f, test_target_1)
-    print(error)
+    output_test = f_function(test,mu,sigma,weights)
+    error_test = error_mean_square(output_test, test_target_1)
+    print(error_test, ': Error test')
+
+    print('Difference: Error train - Error test = ', error_train-error_test)
 
 if __name__ == "__main__":
     main()
