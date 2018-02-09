@@ -34,15 +34,28 @@ def phi_vector(xi, mu, sigma):
         phi_vector[i] = phi_function(xi, mu[i], sigma[i])
     return phi_vector
 
+def error_function(target, phi_vector, weights):
+    error= (target - np.dot(phi_vector.T,weights))
+    return error
 
 def main():
+    eta = 0.0001
     train, test, target_1, target_2 = data()
     mu = np.array([0.3, 0.01, 0.5])
     sigma = np.array([0.5, 10, 1])
     weights = weights_init(mu)
 
-    phi = phi_matrix(train, mu, sigma)
-    f = f_function(train, mu, sigma, weights)
+    for i in range(len(target_1)):
+        phi = phi_vector(train, mu, sigma)
+        error1 = error_function(target_1, phi, weights)
+        deltaW = eta * error * phi
+        weights = weights + deltaW
+
+    for i in range(len(target_2)):
+        phi = phi_vector(train, mu, sigma)
+        error2 = error_function(target_2, phi, weights)
+        deltaW = eta * error * phi
+        weights = weights + deltaW
 
 
 if __name__ == "__main__":
