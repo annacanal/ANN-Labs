@@ -7,7 +7,9 @@ def data():
     test = np.arange(0.05, 2*np.pi, 0.1)
     target_1 = sin_function(train)
     target_2 = square_function(train)
-    return train, test, target_1, target_2
+    test_target_1 = sin_function(test)
+    test_target_2 = square_function(test)
+    return train, test, target_1, target_2, test_target_1, test_target_2
 
 def weights_init(x):
     weights = np.random.rand(len(x))
@@ -53,18 +55,16 @@ def weight_update_batch(phi_matrix, f):
 def error_mean_square(f, target):
     sum = 0
     for i in range(len(f)):
-        sum += f[i] - target[i]
+        sum += (f[i] - target[i])**2
     return sum
 
 def chunkify(seq, num):
     avg = len(seq) / float(num)
     out = []
     last = 0.0
-
     while last < len(seq):
         out.append(seq[int(last):int(last + avg)])
         last += avg
-
     return out
 
 def init_mus(nodes_number, train):
@@ -73,42 +73,34 @@ def init_mus(nodes_number, train):
     chunks = chunkify(train, nodes_number)
     for i,elem in enumerate(chunks):
         mus[i] = np.mean(elem)
-
-
     return mus
 
 def init_sigmas(nodes_number, train):
     sigmas = np.zeros(nodes_number)
-
     chunks = chunkify(train, nodes_number)
     for i, elem in enumerate(chunks):
         sigmas[i] = np.var(elem)
-
     return sigmas
 
 
 def main():
     nodes_number = 3
-    train, test, target_1, target_2 = data()
+    train, test, target_1, target_2, test_target_1, test_target_2 = data()
     mu = init_mus(nodes_number, train)
     sigma = init_sigmas(nodes_number, train)
-    weights = weights_init(mu)
+    # weights = weights_init(mu)
 
+#           Training
     phi = phi_matrix(train, mu, sigma)
+    weights = weight_update_batch(phi, target_1)
+    f = f_function(train, mu, sigma, weights)
+    error = error_mean_square(f, target_1)
+    print(error)
 
-    for i in range(10):
-        f = f_function(train, mu, sigma, weights)
-        weights = weight_update_batch(phi, f)
-        print(weights)
-        error = error_mean_square(f, target_1)
-        # print(error)
-
-def mymain():
-    nodes_number = 3
-    train, test, target_1, target_2 = data()
-    mu = init_mus(nodes_number, train)
-
+#           Testing
+    f = f_function(test,mu,sigma,weights)
+    error = error_mean_square(f, test_target_1)
+    print(error)
 
 if __name__ == "__main__":
-    #main()
-    mymain()
+    main()
