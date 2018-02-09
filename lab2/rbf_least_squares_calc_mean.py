@@ -108,7 +108,7 @@ def init_sigmas(nodes_number, train):
     return sigmas
 
 def main():
-    nodes = np.arange(2,60, 1)
+    nodes = np.arange(2,60, 10)
 
     errors_train = []
     errors_test = []
@@ -130,10 +130,18 @@ def main():
             error_train = error_mean_square(output_train, target_1)
             print(error_train, ': Error train')
 
+
+
             #           Testing
             output_test = f_function(test, mu, sigma, weights)
             error_test = error_mean_square(output_test, test_target_1)
             print(error_test, ': Error test')
+
+            plt.plot(train, target_1)
+            plt.plot(train, output_train)
+            plt.plot(test, output_test)
+            plt.show()
+            plt.clf()
 
             no_nums.append(nodes_number)
             errors_test.append(error_test)
