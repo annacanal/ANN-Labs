@@ -53,24 +53,23 @@ def weight_update_batch(phi_matrix, f):
 def error_mean_square(f, target):
     sum = 0
     for i in range(len(f)):
-        sum += f[i] - target[i]
+        sum += (f[i] - target[i])**2
     return sum
-
 
 def main():
     train, test, target_1, target_2 = data()
-    mu = np.array([0.3, 0.01, 0.5])
-    sigma = np.array([0.5, 10, 1])
+    # mu = np.array([0.3, 0.01, 0.5])
+    # sigma = np.array([0.5, 10, 1])
+    mu = train
+    sigma = np.ones(len(train))*0.5
     weights = weights_init(mu)
 
     phi = phi_matrix(train, mu, sigma)
-
-    for i in range(10):
+    for i in range(100):
         f = f_function(train, mu, sigma, weights)
         weights = weight_update_batch(phi, f)
-        print(weights)
         error = error_mean_square(f, target_1)
-        # print(error)
+        print(error)
 
 if __name__ == "__main__":
     main()
