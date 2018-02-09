@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.matlib
+from numpy.linalg import inv
 
 def data():
     train = np.arange(0, 2*np.pi, 0.1)
@@ -44,6 +45,18 @@ def f_function(x, mu, sigma, weights):
         y[i] = add
     return y
 
+def weight_update_batch(phi_matrix, f): 
+    A = inv(np.matmul(np.transpose(phi_matrix), phi_matrix))
+    w = np.matmul(np.matmul(A,np.transpose(phi_matrix)), np.transpose(f))
+    return w
+
+def error_mean_square(f, target):
+    sum = 0
+    for i in range(len(f)):
+        sum += f[i] - target[i]
+    return sum
+
+
 def main():
     train, test, target_1, target_2 = data()
     mu = np.array([0.3, 0.01, 0.5])
@@ -51,8 +64,13 @@ def main():
     weights = weights_init(mu)
 
     phi = phi_matrix(train, mu, sigma)
-    f = f_function(train, mu, sigma, weights)
 
+    for i in range(10):
+        f = f_function(train, mu, sigma, weights)
+        weights = weight_update_batch(phi, f)
+        print(weights)
+        error = error_mean_square(f, target_1)
+        # print(error)
 
 if __name__ == "__main__":
     main()
