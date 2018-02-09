@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.matlib
 from numpy.linalg import inv
+import matplotlib.pyplot as plt
 
 def data():
     train = np.arange(0, 2*np.pi, 0.1)
@@ -107,26 +108,48 @@ def init_sigmas(nodes_number, train):
     return sigmas
 
 def main():
-    nodes = np.arange(2, 63, 1)
+    nodes = np.arange(2,60, 1)
+
+    errors_train = []
+    errors_test = []
+    no_nums = []
+
     for nodes_number in nodes:
-        # nodes_number = 5
-        print(nodes_number, ": nodes number")
-        train, test, target_1, target_2, test_target_1, test_target_2 = data()
-        mu = init_mus(nodes_number, train)
-        sigma = np.ones(len(mu))*0.5
-        # weights = weights_init(mu)
+        try:
+            # nodes_number = 5
+            print(nodes_number, ": nodes number")
+            train, test, target_1, target_2, test_target_1, test_target_2 = data()
+            mu = init_mus(nodes_number, train)
+            sigma = np.ones(len(mu)) * 0.5
+            # weights = weights_init(mu)
 
-    #           Training
-        phi = phi_matrix(train, mu, sigma)
-        weights = weight_update_batch(phi, target_1)
-        output_train = f_function(train, mu, sigma, weights)
-        error_train = error_mean_square(output_train, target_1)
-        print(error_train, ': Error train')
+            #           Training
+            phi = phi_matrix(train, mu, sigma)
+            weights = weight_update_batch(phi, target_1)
+            output_train = f_function(train, mu, sigma, weights)
+            error_train = error_mean_square(output_train, target_1)
+            print(error_train, ': Error train')
 
-    #           Testing
-        output_test = f_function(test, mu, sigma, weights)
-        error_test = error_mean_square(output_test, test_target_1)
-        print(error_test, ': Error test')
+            #           Testing
+            output_test = f_function(test, mu, sigma, weights)
+            error_test = error_mean_square(output_test, test_target_1)
+            print(error_test, ': Error test')
+
+            no_nums.append(nodes_number)
+            errors_test.append(error_test)
+            errors_train.append(error_train)
+
+
+
+
+        except numpy.linalg.linalg.LinAlgError as err:
+            print("Exception ", err)
+
+
+    plt.plot(no_nums, errors_test)
+    plt.plot(no_nums, errors_train)
+    plt.show()
+
 
                                                                                 #Comment: Weird, test is better than train. 
 
