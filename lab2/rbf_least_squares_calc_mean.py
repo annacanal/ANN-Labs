@@ -47,9 +47,11 @@ def f_function(x, mu, sigma, weights):
         y[i] = add
     return y
 
-def weight_update_batch(phi_matrix, f): 
-    A = inv(np.matmul(np.transpose(phi_matrix), phi_matrix))
-    w = np.matmul(np.matmul(A,np.transpose(phi_matrix)), np.transpose(f))
+def weight_update_batch(phi, f):
+    #A = inv(np.matmul(np.transpose(phi_matrix), phi_matrix))
+    #w = np.matmul(np.matmul(A,np.transpose(phi_matrix)), np.transpose(f))
+    A = inv(np.matmul(np.transpose(phi), phi))
+    w = np.matmul(np.matmul(A, np.transpose(phi)), np.transpose(f))
     return w
 
 def error_mean_square(f, target):
@@ -59,20 +61,42 @@ def error_mean_square(f, target):
     return sum/len(f)
 
 def chunkify(seq, num):
-    avg = len(seq) / float(num)
     out = []
-    last = 0.0
-    while last < len(seq):
-        out.append(seq[int(last):int(last + avg)])
-        last += avg
+
+    if len(seq) % num == 0:
+        length = len(seq) / num
+        plus = 0
+    else:
+        length = len(seq) / num
+        plus = len(seq) % num
+
+    howmany = 0
+    while howmany < len(seq):
+        first = howmany
+        last = first + length
+        if plus > 0:
+            last += 1
+            plus -= 1
+        out.append(seq[int(first):int(last)])
+        howmany += (last - first)
+
     return out
+
+    # avg = len(seq) / float(num)
+    # out = []
+    # last = 0.0
+    # while last < len(seq):
+    #     out.append(seq[int(last):int(last + avg)])
+    #     last += avg
+    # return out
 
 def init_mus(nodes_number, train):
     mus = np.zeros(nodes_number)
 
     chunks = chunkify(train, nodes_number)
     for i,elem in enumerate(chunks):
-        mus[i] = np.mean(elem)
+        mean = np.mean(elem)
+        mus[i] = mean
     return mus
 
 def init_sigmas(nodes_number, train):
@@ -83,23 +107,26 @@ def init_sigmas(nodes_number, train):
     return sigmas
 
 def main():
-    nodes_number = 9
-    train, test, target_1, target_2, test_target_1, test_target_2 = data()
-    mu = init_mus(nodes_number, train)
-    sigma = init_sigmas(nodes_number, train)
-    # weights = weights_init(mu)
+    nodes = np.arange(2, 63, 1)
+    for nodes_number in nodes:
+        # nodes_number = 5
+        print(nodes_number, ": nodes number")
+        train, test, target_1, target_2, test_target_1, test_target_2 = data()
+        mu = init_mus(nodes_number, train)
+        sigma = np.ones(len(mu))*0.5
+        # weights = weights_init(mu)
 
-#           Training
-    phi = phi_matrix(train, mu, sigma)
-    weights = weight_update_batch(phi, target_1)
-    output_train = f_function(train, mu, sigma, weights)
-    error_train = error_mean_square(output_train, target_1)
-    print(error_train, ': Error train')
+    #           Training
+        phi = phi_matrix(train, mu, sigma)
+        weights = weight_update_batch(phi, target_1)
+        output_train = f_function(train, mu, sigma, weights)
+        error_train = error_mean_square(output_train, target_1)
+        print(error_train, ': Error train')
 
-#           Testing
-    output_test = f_function(test, mu, sigma, weights)
-    error_test = error_mean_square(output_test, test_target_1)
-    print(error_test, ': Error test')
+    #           Testing
+        output_test = f_function(test, mu, sigma, weights)
+        error_test = error_mean_square(output_test, test_target_1)
+        print(error_test, ': Error test')
 
                                                                                 #Comment: Weird, test is better than train. 
 
