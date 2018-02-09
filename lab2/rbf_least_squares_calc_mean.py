@@ -97,7 +97,7 @@ def main():
     print(error_train, ': Error train')
 
 #           Testing
-    output_test = f_function(test,mu,sigma,weights)
+    output_test = f_function(test, mu, sigma, weights)
     error_test = error_mean_square(output_test, test_target_1)
     print(error_test, ': Error test')
 
