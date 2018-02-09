@@ -37,8 +37,8 @@ def phi_vector(xi, mu, sigma):
     return phi_vector
 
 def error_function(target, phi_vector, weights):
-    #error= (target - np.dot(phi_vector.T,weights))
-    error = (target - np.dot(weights,phi_vector.T))
+    error= (target - np.dot(phi_vector.T,weights))
+    #error = (target - np.dot(weights,phi_vector.T))
     return error
 
 
@@ -61,7 +61,7 @@ def main():
 
     error_sum = 0
     errors = []
-    epochs = 800
+    epochs = 2000
 
     for i in range(epochs):
         for j in range(len(train)):
@@ -74,7 +74,7 @@ def main():
                 error = error2
             deltaW = eta*error*phi
             weights = weights + deltaW
-            e =  error*error/2
+            e =  np.sqrt((np.sum(error*error))) / len(error)
         errors.append(e)
     iterations = np.arange(epochs)
     name= "Error/iteration"
@@ -83,7 +83,7 @@ def main():
     plt.xlabel('Epochs')
     plt.ylabel('Error')
     plt.show()
-    
+
 
 if __name__ == "__main__":
     main()
