@@ -1,12 +1,14 @@
 import numpy as np
-import numpy.matlib
+import matplotlib.pyplot as plt
 
 def data():
     train = np.arange(0, 2*np.pi, 0.1)
     test = np.arange(0.05, 2*np.pi, 0.1)
     target_1 = sin_function(train)
     target_2 = square_function(train)
-    return train, test, target_1, target_2
+    test_target_1 = sin_function(test)
+    test_target_2 = square_function(test)
+    return train, test, target_1, target_2, test_target_1, test_target_2
 
 def weights_init(x):
     weights = np.random.rand(len(x))
@@ -36,26 +38,87 @@ def phi_vector(xi, mu, sigma):
 
 def error_function(target, phi_vector, weights):
     error= (target - np.dot(phi_vector.T,weights))
+    #error = (target - np.dot(weights,phi_vector.T))
     return error
+
+def chunkify(seq, num):
+    out = []
+
+    if len(seq) % num == 0:
+        length = len(seq) / num
+        plus = 0
+    else:
+        length = len(seq) / num
+        plus = len(seq) % num
+
+    howmany = 0
+    while howmany < len(seq):
+        first = howmany
+        last = first + length
+        if plus > 0:
+            last += 1
+            plus -= 1
+        out.append(seq[int(first):int(last)])
+        howmany += (last - first)
+    return out
+
+def init_mus(nodes_number, train):
+    mus = np.zeros(nodes_number)
+
+    chunks = chunkify(train, nodes_number)
+    for i,elem in enumerate(chunks):
+        mean = np.mean(elem)
+        mus[i] = mean
+    return mus
 
 def main():
     eta = 0.0001
-    train, test, target_1, target_2 = data()
-    mu = np.array([0.3, 0.01, 0.5])
-    sigma = np.array([0.5, 10, 1])
+    sigma_value=0.5
+    nodes= 63
+    train, test, target_1, target_2, test_target_1, test_target_2 = data()
+    #mu= np.linspace(0,2*np.pi,nodes)
+    mu = init_mus(nodes, train)
+    sigma = np.ones(len(mu)) * sigma_value
     weights = weights_init(mu)
     type='sin'
+    # plt.plot(target_2)
+    # plt.show()
+    error_sum = 0
+    errors = []
+    epochs = 2000
+    phi_vecs =[]
 
-    for i in range(len(train)):
-        phi = phi_vector(train, mu, sigma)
-        error1 = error_function(target_1, phi, weights)
-        error2 = error_function(target_2, phi, weights)
-        if type == 'sin':
-            error = error1
-        if type == 'square':
-            error = error2   
-        deltaW = eta * error * phi
-        weights = weights + deltaW
+    for i in range(epochs):
+        for j in range(len(train)):
+            phi = phi_vector(train[j], mu, sigma)
+            if i==epochs-1:
+                phi_vecs.append(phi)
+            if type == 'sin':
+                target = target_1
+            if type == 'square':
+                target = target_2
+            error = error_function(target, phi, weights)
+            deltaW = eta*error*phi
+            weights = weights + deltaW
+            e =  np.sqrt((np.sum(error*error))) / len(error)
+
+
+        errors.append(e)
+    prediction = np.dot(phi_vecs,weights)
+    name = type +" approximation, delta rule"
+    plt.title(name)
+    plt.plot(train, prediction, label="Prediction")
+    plt.plot(train, target, label="Target")
+    plt.legend()
+    plt.show()
+
+    iterations = np.arange(epochs)
+    name= "Error/iteration delta rule"
+    plt.title(name)
+    plt.plot(iterations, errors,'blue')
+    plt.xlabel('Epochs')
+    plt.ylabel('Error')
+    plt.show()
 
 
 if __name__ == "__main__":
