@@ -55,7 +55,7 @@ def weight_update_batch(phi_matrix, f):
 def error_mean_square(f, target):
     sum = 0
     for i in range(len(f)):
-        sum += np.absolute((f[i] - target[i]))**2
+        sum += (f[i] - target[i])**2
     return sum/len(f)
 
 def chunkify(seq, num):
@@ -83,7 +83,7 @@ def init_sigmas(nodes_number, train):
     return sigmas
 
 def main():
-    nodes_number = 9
+    nodes_number = 3
     train, test, target_1, target_2, test_target_1, test_target_2 = data()
     mu = init_mus(nodes_number, train)
     sigma = init_sigmas(nodes_number, train)
@@ -92,6 +92,7 @@ def main():
 #           Training
     phi = phi_matrix(train, mu, sigma)
     weights = weight_update_batch(phi, target_1)
+
     output_train = f_function(train, mu, sigma, weights)
     error_train = error_mean_square(output_train, target_1)
     print(error_train, ': Error train')
