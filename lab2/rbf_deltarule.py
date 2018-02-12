@@ -129,8 +129,8 @@ def main():
     prediction = np.dot(phi_vecs,weights)
     name = type +" approximation, delta rule"
     plt.title(name)
-    plt.scatter(train, prediction, label="Prediction")
-    plt.scatter(train, target, label="Target")
+    plt.scatter(train, prediction,s=2.5, label="Prediction")
+    plt.scatter(train, target, s=2.5, label="Target")
     plt.legend()
     plt.show()
 
