@@ -2,13 +2,27 @@ import numpy as np
 import numpy.matlib
 import matplotlib.pyplot as plt
 
-def data():
+def data(noise):
     train = np.arange(0, 2*np.pi, 0.1)
     test = np.arange(0.05, 2*np.pi, 0.1)
+    #Adding noise with variance=0.1
+    if (noise==1):
+        noise_train = np.random.normal(0, 0.1, len(train))
+        noise_test = np.random.normal(0, 0.1, len(test))
+        train = train + noise_train
+        test = test + noise_test
+
     target_1 = sin_function(train)
-    target_2 = square_function(train)
+    # plt.title("sin_noise")
+    # plt.plot(target_1)
+    # plt.show()
     test_target_1 = sin_function(test)
+    # plt.title("sin_test_noise")
+    # plt.plot(test_target_1)
+    # plt.show()
+    target_2 = square_function(train)
     test_target_2 = square_function(test)
+
     return train, test, target_1, target_2, test_target_1, test_target_2
 
 # def weights_init(x):
@@ -103,7 +117,8 @@ def main():
         try:
             # nodes_number = 5
             print(nodes_number, ": nodes number")
-            train, test, target_1, target_2, test_target_1, test_target_2 = data()
+            noise=1;
+            train, test, target_1, target_2, test_target_1, test_target_2 = data(noise)
             mu = init_mus(nodes_number, train)
             sigma= np.ones(len(mu)) * sigma_value
             #Calculation of phi_matrixs
