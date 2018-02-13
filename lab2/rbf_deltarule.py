@@ -32,14 +32,14 @@ def data(noise):
 
     return train, test, target_1, target_2, test_target_1, test_target_2
 
-def mlp_backprop(train, target, nodes, eta):
+def mlp_backprop(train, target, test, nodes, eta):
     nn = MLPRegressor(
         hidden_layer_sizes=(nodes,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
         learning_rate='constant', learning_rate_init= eta, power_t=0.5, max_iter=1000, shuffle=True,
         random_state=9, tol=0.0001, momentum=0.9, nesterovs_momentum=True,
         early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     n = nn.fit(train, target)
-    test_y = nn.predict(test_x)
+    test_y = n.predict(test)
     return test_y
 
 def weights_init(x):
@@ -123,45 +123,59 @@ def main():
     phi_vecs =[]
     error_vector = []
 
-    for i in range(epochs):
-        for j in range(len(train)):
-            phi = phi_vector(train[j], mu, sigma)
-            if i==epochs-1:
-                phi_vecs.append(phi)
-            if type == 'sin':
-                target = target_1
-            if type == 'square':
-                target = target_2
-            error = error_function(target[j], phi, weights)
-            deltaW = eta*error*phi
-            weights = weights + deltaW
-            errors.append(error)
-        error_average = - np.mean(errors)
-        error_vector.append(error_average)
+    # for i in range(epochs):
+    #     for j in range(len(train)):
+    #         phi = phi_vector(train[j], mu, sigma)
+    #         if i==epochs-1:
+    #             phi_vecs.append(phi)
+    #         if type == 'sin':
+    #             target = target_1
+    #         if type == 'square':
+    #             target = target_2
+    #         error = error_function(target[j], phi, weights)
+    #         deltaW = eta*error*phi
+    #         weights = weights + deltaW
+    #         errors.append(error)
+    #     error_average = - np.mean(errors)
+    #     error_vector.append(error_average)
             # e =  np.sqrt((np.sum(error*error))) / len(error)
         # errors.append(e)
     
-    #MLP_Regressor: 
+    #MLP_Regressor: -------------------------------------------------------
     eta = [0.0001, 0.001, 0.01, 0.1]
-    nodes = [2, 10, 20, 30, 40, 50, 63]
-    for 
-    for 
+    nodes = [63]
+    mlp_errors = []
+    errors_tot= []
+    if type == 'sin':
+        target = target_1
+    if type == 'square':
+        target = target_2
+    train = train.reshape(-1,1) #columnvector
+    for i in range(len(eta)): 
+        for j in range(len(nodes)):
+            mlp_error = 0
+            y_test =  mlp_backprop(train, target, test, nodes[j], eta[i])
+            mlp_error = 1/2*(target-y_test)**2
+            mlp_errors.append(mlp_error)
+        errors_tot.append(mlp_errors)
+    print(errors_tot)
+    #-----------------------------------------------------------------------
 
-    prediction = np.dot(phi_vecs,weights)
-    name = type +" approximation, delta rule"
-    plt.title(name)
-    plt.scatter(train, prediction,s=2.5, label="Prediction")
-    plt.scatter(train, target, s=2.5, label="Target")
-    plt.legend()
-    plt.show()
+    # prediction = np.dot(phi_vecs,weights)
+    # name = type +" approximation, delta rule"
+    # plt.title(name)
+    # plt.scatter(train, prediction,s=2.5, label="Prediction")
+    # plt.scatter(train, target, s=2.5, label="Target")
+    # plt.legend()
+    # plt.show()
 
-    iterations = np.arange(epochs)
-    name= "Error/iteration delta rule"
-    plt.title(name)
-    plt.plot(iterations, error_vector,'blue')
-    plt.xlabel('Epochs')
-    plt.ylabel('Error')
-    plt.show()
+    # iterations = np.arange(epochs)
+    # name= "Error/iteration delta rule"
+    # plt.title(name)
+    # plt.plot(iterations, error_vector,'blue')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Error')
+    # plt.show()
 
 
 if __name__ == "__main__":
