@@ -33,8 +33,8 @@ def data(noise):
 
 def mlp_backprop(train, target, test, nodes, eta):
     nn = MLPRegressor(
-        hidden_layer_sizes=(10,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
-        learning_rate='constant', learning_rate_init= 0.001, power_t=0.5, max_iter=1000, shuffle=True,
+        hidden_layer_sizes=(nodes,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
+        learning_rate='constant', learning_rate_init= eta, power_t=0.5, max_iter=2000, shuffle=True,
         random_state=9, tol=0.0001, momentum=0.9, nesterovs_momentum=True,
         early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     n = nn.fit(train, target)
@@ -142,7 +142,7 @@ def main():
     
     #MLP_Regressor: -------------------------------------------------------
     eta = [0.0001, 0.001, 0.01, 0.1]    #Eta doesn't have any effect at all.
-    nodes = [2, 10, 20, 30, 40, 50, 63]
+    nodes = [10, 30, 40, 50, 63]
     mlp_errors = []
     errors_tot= []
     if type == 'sin':
@@ -157,9 +157,10 @@ def main():
         for j in range(len(nodes)):
             y_test =  mlp_backprop(train, target, test, nodes[j], eta[i])
             for k in range(len(target)):
-                mlp_error += (target[k]-y_test[k])
+                mlp_error += np.absolute((target[k]-y_test[k]))
             mlp_error = mlp_error/len(target)
-            mlp_errors.append(-mlp_error)
+            # print(mlp_error)
+            mlp_errors.append(mlp_error)
         errors_tot.append(mlp_errors)
     for i in range(len(eta)):
         print('eta = ', eta[i])
