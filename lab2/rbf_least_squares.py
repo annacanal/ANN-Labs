@@ -25,10 +25,6 @@ def data(noise):
 
     return train, test, target_1, target_2, test_target_1, test_target_2
 
-# def weights_init(x):
-#     weights = np.random.rand(len(x))
-#     return weights
-
 def sin_function(x):
     y = np.zeros(len(x))
     for i in range(len(x)):
@@ -51,22 +47,6 @@ def phi_matrix(x, mu, sigma):
         for j in range(len(mu)):
             phi[i][j] = phi_function(x[i], mu[j], sigma[j])
     return phi
-
-# def f_function(x, mu, sigma, weights):
-#     y = np.zeros(len(x))
-#     for i in range(len(x)):
-#         add = 0
-#         for j in range(len(mu)):
-#             add += phi_function(x[i], mu[j], sigma[j])*weights[j]
-#         y[i] = add
-#     return y
-
-# def weight_update_batch(phi, f):
-#     #A = inv(np.matmul(np.transpose(phi_matrix), phi_matrix))
-#     #w = np.matmul(np.matmul(A,np.transpose(phi_matrix)), np.transpose(f))
-#     A = inv(np.matmul(np.transpose(phi), phi))
-#     w = np.matmul(np.matmul(A, np.transpose(phi)), np.transpose(f))
-#     return w
 
 def error_mean_square(f, target):
     sum = 0
@@ -114,16 +94,16 @@ def main():
     errors_sin = []
     errors_square = []
     no_nums = []
-    train, test, target_1, target_2, test_target_1, test_target_2 = data()
+    # train, test, target_1, target_2, test_target_1, test_target_2 = data()
 
     for nodes_number in nodes:
         try:
             # nodes_number = 5
             print(nodes_number, ": nodes number")
-            noise=1;
+            noise = 1
             train, test, target_1, target_2, test_target_1, test_target_2 = data(noise)
             mu = init_mus(nodes_number, train)
-            sigma= np.ones(len(mu)) * sigma_value
+            sigma = np.ones(len(mu)) * sigma_value
 
             #Calculation of phi_matrices:
             phi_train = phi_matrix(train, mu, sigma)
@@ -178,3 +158,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# def f_function(x, mu, sigma, weights):
+#     y = np.zeros(len(x))
+#     for i in range(len(x)):
+#         add = 0
+#         for j in range(len(mu)):
+#             add += phi_function(x[i], mu[j], sigma[j])*weights[j]
+#         y[i] = add
+#     return y
+
+# def weight_update_batch(phi, f):
+#     #A = inv(np.matmul(np.transpose(phi_matrix), phi_matrix))
+#     #w = np.matmul(np.matmul(A,np.transpose(phi_matrix)), np.transpose(f))
+#     A = inv(np.matmul(np.transpose(phi), phi))
+#     w = np.matmul(np.matmul(A, np.transpose(phi)), np.transpose(f))
+#     return w
+
+# def weights_init(x):
+#     weights = np.random.rand(len(x))
+#     return weights

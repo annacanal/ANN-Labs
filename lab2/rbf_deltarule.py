@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.neural_network import MLPRegressor
 
 def data(noise):
     train = np.arange(0, 2*np.pi, 0.1)
@@ -30,6 +31,16 @@ def data(noise):
 
 
     return train, test, target_1, target_2, test_target_1, test_target_2
+
+def mlp_backprop(train, target, nodes, eta):
+    nn = MLPRegressor(
+        hidden_layer_sizes=(nodes,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
+        learning_rate='constant', learning_rate_init= eta, power_t=0.5, max_iter=1000, shuffle=True,
+        random_state=9, tol=0.0001, momentum=0.9, nesterovs_momentum=True,
+        early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+    n = nn.fit(train, target)
+    test_y = nn.predict(test_x)
+    return test_y
 
 def weights_init(x):
     weights = np.random.rand(len(x))
@@ -110,6 +121,7 @@ def main():
     errors = []
     epochs = 2000
     phi_vecs =[]
+    error_vector = []
 
     for i in range(epochs):
         for j in range(len(train)):
@@ -124,11 +136,17 @@ def main():
             deltaW = eta*error*phi
             weights = weights + deltaW
             errors.append(error)
-        
+        error_average = - np.mean(errors)
+        error_vector.append(error_average)
             # e =  np.sqrt((np.sum(error*error))) / len(error)
         # errors.append(e)
-
     
+    #MLP_Regressor: 
+    eta = [0.0001, 0.001, 0.01, 0.1]
+    nodes = [2, 10, 20, 30, 40, 50, 63]
+    for 
+    for 
+
     prediction = np.dot(phi_vecs,weights)
     name = type +" approximation, delta rule"
     plt.title(name)
@@ -137,13 +155,13 @@ def main():
     plt.legend()
     plt.show()
 
-    # iterations = np.arange(epochs)
-    # name= "Error/iteration delta rule"
-    # plt.title(name)
-    # plt.plot(iterations, errors,'blue')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Error')
-    # plt.show()
+    iterations = np.arange(epochs)
+    name= "Error/iteration delta rule"
+    plt.title(name)
+    plt.plot(iterations, error_vector,'blue')
+    plt.xlabel('Epochs')
+    plt.ylabel('Error')
+    plt.show()
 
 
 if __name__ == "__main__":
