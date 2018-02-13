@@ -97,9 +97,10 @@ def main():
 
     with open("data_lab2/animalnames.txt", "r") as f:
         # Read the whole file at once
-        names = f.read()
-    names2 = names.split("\t\n")
-    print(names2)
+        names = f.readlines()
+    names = [x.strip() for x in names]
+    #print(names)
+    #names2 = names.split("\t\n")
     pos = []
     idx_names=[]
     for i in range(len(animals_data)):
@@ -111,9 +112,12 @@ def main():
     ordered_pos = sorted(zip(pos, idx_names))
 
     print(ordered_pos)
+    names_order=[]
+    for i in range(len(names)):
+        pos = ordered_pos[i][1]
+        names_order.append(names[pos])
 
-    for i in range(len(animals_data)):
-        print(names2[ordered_pos[i][1]])
+    print(names_order)
 
 if __name__ == "__main__":
     main()
