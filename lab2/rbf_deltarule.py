@@ -1,13 +1,34 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def data():
+def data(noise):
     train = np.arange(0, 2*np.pi, 0.1)
     test = np.arange(0.05, 2*np.pi, 0.1)
+
+    #Adding noise with variance=0.1
+    if (noise==1):
+        noise_train = np.random.normal(0, 0.1, len(train))
+        noise_test = np.random.normal(0, 0.1, len(test))
+        train = train + noise_train
+        test = test + noise_test
+
     target_1 = sin_function(train)
-    target_2 = square_function(train)
     test_target_1 = sin_function(test)
+    target_2 = square_function(train)
     test_target_2 = square_function(test)
+
+    # Shuffle data
+    index_train = np.random.permutation(len(train))
+    index_test = np.random.permutation(len(test))
+    #np.random.shuffle(train)
+    train = train[index_train]
+    test=test[index_test]
+    target_1 = target_1[index_train]
+    test_target_1=test_target_1[index_test]
+    target_2 = target_2[index_train]
+    test_target_2=test_target_2[index_test]
+
+
     return train, test, target_1, target_2, test_target_1, test_target_2
 
 def weights_init(x):
@@ -75,7 +96,8 @@ def main():
     eta = 0.0001
     sigma_value=0.5
     nodes= 63
-    train, test, target_1, target_2, test_target_1, test_target_2 = data()
+    noise=0 #noise=0 without noise, noise=1 for a gaussian noise
+    train, test, target_1, target_2, test_target_1, test_target_2 = data(noise)
     #mu= np.linspace(0,2*np.pi,nodes)
     mu = init_mus(nodes, train)
     sigma = np.ones(len(mu)) * sigma_value
@@ -107,8 +129,8 @@ def main():
     prediction = np.dot(phi_vecs,weights)
     name = type +" approximation, delta rule"
     plt.title(name)
-    plt.plot(train, prediction, label="Prediction")
-    plt.plot(train, target, label="Target")
+    plt.scatter(train, prediction,s=2.5, label="Prediction")
+    plt.scatter(train, target, s=2.5, label="Target")
     plt.legend()
     plt.show()
 
