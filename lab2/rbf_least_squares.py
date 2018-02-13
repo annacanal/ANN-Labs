@@ -62,6 +62,7 @@ def error_mean_square(f, target):
 
 
 def chunkify(seq, num):
+    #Divide the train set in "number of nodes" equal parts. 
     out = []
 
     if len(seq) % num == 0:
@@ -93,22 +94,26 @@ def init_mus(nodes_number, train):
     return mus
 
 def main():
+    # nodes = [2, 3]
     nodes = np.arange(2,60, 10)
     sigma_value= 0.5
     errors_sin = []
     errors_square = []
     no_nums = []
+    train, test, target_1, target_2, test_target_1, test_target_2 = data()
 
     for nodes_number in nodes:
         try:
             # nodes_number = 5
             print(nodes_number, ": nodes number")
-            train, test, target_1, target_2, test_target_1, test_target_2 = data()
             mu = init_mus(nodes_number, train)
             sigma= np.ones(len(mu)) * sigma_value
-            #Calculation of phi_matrixs
+
+            #Calculation of phi_matrices:
             phi_train = phi_matrix(train, mu, sigma)
             phi_test = phi_matrix(test, mu, sigma)
+
+            #Train: 
             #sinus weights
             weights_1 = np.linalg.lstsq(phi_train, target_1)
             #squares weights
@@ -116,7 +121,7 @@ def main():
 
             #Sinus prediction
             prediction1 = np.dot(phi_test,weights_1[0])
-            name = "Sinus approximation"
+            name = "Sinus approximation", nodes_number
             plt.title(name)
             plt.plot(test, prediction1, MarkerSize=1.5, label= "Prediction")
             plt.plot(test, test_target_1, MarkerSize=15.0, label= "Target")
@@ -125,7 +130,7 @@ def main():
 
             #Square prediction
             prediction2 = np.dot(phi_test,weights_2[0])
-            name = "Square approximation"
+            name = "Square approximation", nodes_number
             plt.title(name)
             plt.plot(test, prediction2, label= "Prediction")
             plt.plot(test, test_target_2, label= "Target")

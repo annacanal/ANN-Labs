@@ -118,7 +118,7 @@ def main():
         try:
             # nodes_number = 5
             print(nodes_number, ": nodes number")
-            train, test, target_1, target_2, test_target_1, test_target_2 = data()
+            train, test, target_1, target_2, test_target_1, test_target_2 = data()      #Don't have do this every time - remove from for-loop.
             mu = init_mus(nodes_number, train)
             sigma = np.ones(len(mu)) * 0.5
             # weights = weights_init(mu)
