@@ -29,13 +29,12 @@ def data(noise):
     # target_2 = target_2[index_train]
     # test_target_2=test_target_2[index_test]
 
-
     return train, test, target_1, target_2, test_target_1, test_target_2
 
 def mlp_backprop(train, target, test, nodes, eta):
     nn = MLPRegressor(
-        hidden_layer_sizes=(nodes,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
-        learning_rate='constant', learning_rate_init= eta, power_t=0.5, max_iter=1000, shuffle=True,
+        hidden_layer_sizes=(10,),  activation='logistic', solver='adam', alpha=0.001, batch_size='auto',
+        learning_rate='constant', learning_rate_init= 0.001, power_t=0.5, max_iter=1000, shuffle=True,
         random_state=9, tol=0.0001, momentum=0.9, nesterovs_momentum=True,
         early_stopping=True, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
     n = nn.fit(train, target)
@@ -142,8 +141,8 @@ def main():
         # errors.append(e)
     
     #MLP_Regressor: -------------------------------------------------------
-    eta = [0.0001, 0.001, 0.01, 0.1]
-    nodes = [63]
+    eta = [0.0001, 0.001, 0.01, 0.1]    #Eta doesn't have any effect at all.
+    nodes = [2, 10, 20, 30, 40, 50, 63]
     mlp_errors = []
     errors_tot= []
     if type == 'sin':
@@ -151,14 +150,20 @@ def main():
     if type == 'square':
         target = target_2
     train = train.reshape(-1,1) #columnvector
-    for i in range(len(eta)): 
+    test = test.reshape(-1,1)
+    np.transpose(target)
+    for i in range(len(eta)):
+        mlp_error = 0
         for j in range(len(nodes)):
-            mlp_error = 0
             y_test =  mlp_backprop(train, target, test, nodes[j], eta[i])
-            mlp_error = 1/2*(target-y_test)**2
-            mlp_errors.append(mlp_error)
+            for k in range(len(target)):
+                mlp_error += (target[k]-y_test[k])
+            mlp_error = mlp_error/len(target)
+            mlp_errors.append(-mlp_error)
         errors_tot.append(mlp_errors)
-    print(errors_tot)
+    for i in range(len(eta)):
+        print('eta = ', eta[i])
+        print(errors_tot[i])
     #-----------------------------------------------------------------------
 
     # prediction = np.dot(phi_vecs,weights)
