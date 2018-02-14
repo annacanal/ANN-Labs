@@ -30,44 +30,58 @@ def get_data_matrix():
 
     return party_matrix, gender_matrix, district_matrix, vote_matrix
 
-<<<<<<< HEAD
-# def get_animal_names():
-#     with open("data_lab2/animalnames.txt", "r") as f:
-#         # Read the whole file at once
-#         names = f.readlines()
-#     names = [x.strip() for x in names]
-#     return names
-=======
 def get_party_color(party):
     if party == 0:
         color = 'grey'
+        legend = 'no party'
     elif party == 1:
         color = 'red'
+        legend = 'm'
     elif party == 2:
         color = 'firebrick'
+        legend = 'fp'
     elif party == 3:
         color = 'skyblue'
+        legend = 's'
     elif party == 4:
         color = 'dodgerblue'
+        legend = 'v'
     elif party == 5:
         color = 'purple'
+        legend = 'mp'
     elif party == 6:
         color = 'maroon'
+        legend = 'kd'
     elif party == 7:
         color = 'lightcoral'
+        legend = 'c'
     else:
         print(party, "WRONGPARTY")
         exit(1)
 
+    return(color, legend)
+
+def get_gender_color(gender):
+    if gender == 0:
+        color = 'skyblue'
+        marker = '^'
+        label = 'male'
+    elif gender == 1:
+        color = 'lightcoral'
+        marker = 'v'
+        label = 'female'
+    else:
+        print(gender, "WRONGGENDER")
+        exit(1)
+
+    return(color, marker, label)
+
+def get_district_color(districts, dstr):
+    #we will get greyscale colors between 0 and 1
+    color = str(float(dstr)/float(max(districts)))
+
     return(color)
 
-def get_animal_names():
-    with open("data_lab2/animalnames.txt", "r") as f:
-        # Read the whole file at once
-        names = f.readlines()
-    names = [x.strip() for x in names]
-    return names
->>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
 
 def find_bmu(t, net):
     """
@@ -114,18 +128,11 @@ def main():
     init_radius = 5
     # radius decay parameter
     time_constant = epochs / np.log(init_radius)
-<<<<<<< HEAD
 
     # Learning
     for i in range(epochs):
         # for each MP
-        for j in range((votes_data.shape[b0])):      #349
-=======
-    # Learning
-    for i in range(epochs):
-        # for each MP
         for j in range((votes_data.shape[0])):
->>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
             row_p = votes_data[j][:]
             bmu, bmu_idx = find_bmu(row_p, net)
 
@@ -152,18 +159,9 @@ def main():
                         # commit the new weight
                         net[x][y] = new_w
 
-    #display the results
-<<<<<<< HEAD
-    posx = []
-    posy = []
-    for i in range(votes_data.shape[0]):
-        row_p = votes_data[i][:]
-        bmu, bmu_idx = find_bmu(row_p, net)
-        posx.append(bmu_idx[0])
-        posy.append(bmu_idx[1])
-
-    plt.scatter(posx, posy)
-=======
+    #display the results for parties
+    ax = plt.subplot(111)
+    plt.title("Votes according to party")
     parties = set(party_matrix[0][:])
     parties = list(parties)
     for prt in range(len(parties)):
@@ -177,30 +175,58 @@ def main():
 
                 posx.append(bmu_idx[0])
                 posy.append(bmu_idx[1])
-        clr = get_party_color(prt)
-        plt.scatter(posx, posy, color = clr, alpha=0.7)
->>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
-    plt.show()
+        clr,lbl = get_party_color(prt)
+        ax.scatter(posx, posy, color = clr, label = lbl, alpha=0.7)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    ax.legend(loc = 'center left', bbox_to_anchor=(1, 0.5))
 
-        #
-    # # Find index for species
-    # names = get_animal_names()
-    # pos = []
-    # idx_names = []
-    # for i in range(len(animals_data)):
-    #     row_p = animals_data[i][:]
-    #     bmu, bmu_idx = find_bmu(row_p, net)
-    #     idx_names.append(i)
-    #     pos.append(bmu_idx)
-    #
-    # ordered_pos = sorted(zip(pos, idx_names))
-    # print(ordered_pos)
-    # names_order = []
-    # for i in range(len(names)):
-    #     pos = ordered_pos[i][1]
-    #     names_order.append(names[pos])
-    #     print(names_order[i])
-    # # print(names_order)
+    plt.show()
+    plt.clf()
+
+
+    # display the results for gender
+    ax = plt.subplot(111)
+    plt.title("Votes according to gender")
+    genders = list(set(gender_matrix[0][:]))
+    for gnd in range(len(genders)):
+        posx = []
+        posy = []
+        for i in range(votes_data.shape[0]):
+            gndidx = genders.index(gender_matrix[0][i])
+            if gndidx == gnd:
+                row_p = votes_data[i][:]
+                bmu, bmu_idx = find_bmu(row_p, net)
+
+                posx.append(bmu_idx[0])
+                posy.append(bmu_idx[1])
+        clr, mrk, lbl = get_gender_color(gnd)
+        ax.scatter(posx, posy, color=clr, marker = mrk, label = lbl, alpha=0.7)
+    ax.legend(loc = 'center', bbox_to_anchor=(0.9, 1.07))
+    plt.show()
+    plt.clf()
+
+    # display the results for district
+    plt.title("Votes according to district")
+    districts = list(set(district_matrix[0][:]))
+    for dstr in range(len(districts)):
+        posx = []
+        posy = []
+        for i in range(votes_data.shape[0]):
+            dstridx = districts.index(district_matrix[0][i])
+            if dstridx == dstr:
+                row_p = votes_data[i][:]
+                bmu, bmu_idx = find_bmu(row_p, net)
+
+                posx.append(bmu_idx[0])
+                posy.append(bmu_idx[1])
+        clr = get_district_color(districts, districts[dstr])
+        plt.scatter(posx, posy, color=clr)
+    plt.show()
+    plt.clf()
+
+
+
 
 if __name__ == "__main__":
      main()
