@@ -32,10 +32,6 @@ def data(noise):
 
     return train, test, target_1, test_target_1
 
-def weights_init(x):
-    weights = np.random.rand(len(x))
-    return weights
-
 def sin_function(x):
     y = np.zeros(len(x))
     for i in range(len(x)):
@@ -58,65 +54,78 @@ def error_function(target, phi_vector, weights):
     #error = (target - np.dot(weights,phi_vector.T))
     return error
 
-def chunkify(seq, num):
-    out = []
+def find_bmu(t, net):
+    """
+        Find the best matching unit for a given vector, t, in the SOM
+        Returns: a (bmu, bmu_idx) tuple where bmu is the high-dimensional BMU
+                 and bmu_idx is the index of this vector in the SOM
+    """
+    bmu_idx = []
+    # set the initial minimum distance to a huge number
+    min_dist = np.iinfo(np.int).max
+    # calculate the high-dimensional distance between each neuron and the input
+    for x in range(net.shape[0]):
+        #for y in range(net.shape[1]):
+        w = net[x]
+        # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
+        sq_dist = np.sum((w - t) ** 2)
+        if sq_dist < min_dist:
+            min_dist = sq_dist
+            #bmu_idx = np.array([x, y])
+            bmu_idx = x
+    # get vector corresponding to bmu_idx
+    #bmu = net[bmu_idx[0], bmu_idx[1], :].reshape(m, 1)
+    bmu = net[bmu_idx]
+    # return the (bmu, bmu_idx) tuple
+    return (bmu, bmu_idx)
 
-    if len(seq) % num == 0:
-        length = len(seq) / num
-        plus = 0
-    else:
-        length = len(seq) / num
-        plus = len(seq) % num
+def decay_radius(initial_radius, i, time_constant):
+    return initial_radius * np.exp(-i / time_constant)
 
-    howmany = 0
-    while howmany < len(seq):
-        first = howmany
-        last = first + length
-        if plus > 0:
-            last += 1
-            plus -= 1
-        out.append(seq[int(first):int(last)])
-        howmany += (last - first)
-    return out
+def decay_learning_rate(initial_learning_rate, i, epochs):
+    return initial_learning_rate * np.exp(-i / epochs)
 
-def init_mus(nodes_number, train):
-    mus = np.zeros(nodes_number)
-
-    chunks = chunkify(train, nodes_number)
-    for i,elem in enumerate(chunks):
-        mean = np.mean(elem)
-        mus[i] = mean
-    return mus
+def calculate_influence(distance, radius):
+    return np.exp(-distance / (2* (radius**2)))
 
 def main():
     eta = 0.0001
     sigma_value=0.2
     nodes= 20
  
-    epochs = 1
+    epochs = 20
     init_learning_rate = 0.2
     init_radius = 50
     time_constant = epochs / np.log(init_radius)
+    net = np.random.random((20, 1))
 
     noise = 0 #noise=0 without noise, noise=1 for a gaussian noise
-    train, test, target_1, test_target_1 = data(noise)
-    mu = init_mus(nodes, train)
+    train, test, target_1, test_target_1 = data(noise)  # calc only sin(2x)
 
-    net = np.random.random((20, 63))
-
-    phi_vecs =[]
-    for j in range(len(train)):
-        phi = phi_vector(train[j], mu, sigma_value)
-        phi_vecs.append(phi)
-   
-    np.random.shuffle(phi_vecs)
-   
+    #Competitative learning: 
     for i in range(epochs):
-        for j in range(len(phi_vecs)):
-            row_p = phi_vecs[j]
-
+        row_p = train
+        bmu, bmu_idx = find_bmu(row_p, net)
+        r = decay_radius(init_radius, i, time_constant)
+        l = decay_learning_rate(init_learning_rate, i, epochs)
+        for x in range(net.shape[0]): # number of nodes
+            w = net[x]
+            w_dist = np.sum((x - bmu_idx) ** 2)                                        
+            if w_dist <= r**2:
+                influence = calculate_influence(w_dist, r)
+                new_w = w + (l * influence * (row_p - w))
+                net[x] = new_w[0]
     
+    mu = net.flatten()  #initialization weights for the delta rule.
+    phi_vecs = []
 
+    #Delta rule:
+    for i in range(epochs):
+        for j in range(len(train)):
+            phi = phi_vector(train[j], mu, sigma_value)
+            error = error_function(target[j], phi, weights)
+        phi_vecs.append(phi)
+        
 
     # prediction = np.dot(phi_vecs,weights)
     # name = type +" approximation, delta rule"
