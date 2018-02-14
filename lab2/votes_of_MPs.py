@@ -1,17 +1,11 @@
 import numpy as np
 
 def get_data_matrix():
-    # mpdistrict.dat: 349 single column data (1-29) 
-    # mpnames.dat: Just the 349 names
-    # mpparty.dat: 352 single column data (0-7) which party
-    # mpsex.dat: 351 single column data (0,1) 0 - male, 1-female
-    # votes.dat: one line of many values (0, 0.5, 1)
-
-    with open("data_lab2/mpsex.dat", "r") as binary_file:
+    with open("data_lab2/mpsex.dat", "r") as file:
         # Read the whole file at once
         data = file.readlines()
-    data_matrix = np.zeros((1,349))
-    for i in range(data_matrix.shape[0]-1):
+    gender_matrix = np.zeros((1,349))
+    for i in range(gender_matrix.shape[0]-1):
         for j in range(data_matrix.shape[1] - 1):
             position = i*data_matrix.shape[1] + j
             data_matrix[i][j]= data2[position]
