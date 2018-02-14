@@ -75,14 +75,14 @@ def main():
     # for i in range(len(eta)):
     for j in range(len(nodes)):
         y_test =  mlp_backprop(train, target, test, nodes[j], eta = 0.01)
-        print(target, "target!")
-        print(y_test, "ytest")
+        # print(target, "target!")
+        # print(y_test, "ytest")
         mlp_error = 0
         for k in range(len(target)):
             mlp_error += np.absolute((target[k]-y_test[k]))
         
         mlp_error = mlp_error/len(target)
-        # print(mlp_error)
+        print(mlp_error)
     #         mlp_errors.append(mlp_error)
     #     errors_tot.append(mlp_errors)
     # for i in range(len(eta)):
