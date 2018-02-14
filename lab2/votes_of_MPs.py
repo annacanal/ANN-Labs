@@ -1,16 +1,38 @@
 import numpy as np
 
 def get_data_matrix():
-    with open("data_lab2/mpsex.dat", "r") as file:
-        # Read the whole file at once
-        data = file.readlines()
-    gender_matrix = np.zeros((1,349))
-    for i in range(gender_matrix.shape[0]-1):
-        for j in range(data_matrix.shape[1] - 1):
-            position = i*data_matrix.shape[1] + j
-            data_matrix[i][j]= data2[position]
+    doc = ["data_lab2/mpparty.dat","data_lab2/mpsex.dat","data_lab2/mpdistrict.dat"]
+    matrices = []
+    for i in range(len(doc)):
+        with open(doc[i], "r") as file:
+            # Read the whole file at once
+            data = file.readlines()
+        data_matrix = np.zeros((1, 349))
+        for i in range(data_matrix.shape[0]):
+            for j in range(data_matrix.shape[1]):
+                position = i*data_matrix.shape[1] + j
+                data_matrix[i][j]= data[position]
+        matrices.append(data_matrix)
+    party_matrix = matrices[0]
+    gender_matrix = matrices[1]
+    district_matrix = matrices[2]
 
-    return data_matrix
+    with open("data_lab2/votes.dat", "r") as file:
+        # Read the whole file at once
+        data = np.array(file.readlines())
+        print(data)
+    vote_matrix = np.zeros((349, 31))
+    data.flatten()   
+    data.split(",")
+    print(data)
+    # for i in range(vote_matrix.shape[0]): #349
+    #     for j in range(vote_matrix.shape[1]): #31
+    #         position = i*vote_matrix.shape[1] + j
+    #         vote_matrix[i][j]= data[position]
+    return party_matrix, gender_matrix, district_matrix, vote_matrix
+
+p, g, d, data = get_data_matrix()
+# print(data)
 
 # def get_animal_names():
 #     with open("data_lab2/animalnames.txt", "r") as f:
