@@ -32,6 +32,10 @@ def data(noise):
 
     return train, test, target_1, test_target_1
 
+def weights_init(x):
+    weights = np.random.rand(len(x))
+    return weights
+
 def sin_function(x):
     y = np.zeros(len(x))
     for i in range(len(x)):
@@ -93,7 +97,7 @@ def main():
     sigma_value=0.2
     nodes= 20
  
-    epochs = 20
+    epochs = 2000
     init_learning_rate = 0.2
     init_radius = 50
     time_constant = epochs / np.log(init_radius)
@@ -120,11 +124,18 @@ def main():
     phi_vecs = []
 
     #Delta rule:
+    weights = weights_init(mu)
+
     for i in range(epochs):
+        sumerror = 0
         for j in range(len(train)):
             phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(target[j], phi, weights)
-        phi_vecs.append(phi)
+            error = error_function(target_1[j], phi, weights)
+            deltaW = eta*error*phi
+            weights = weights + deltaW
+            sumerror += (1/2)*error**2
+        error = sumerror/len(train)
+    print(error)
         
 
     # prediction = np.dot(phi_vecs,weights)
