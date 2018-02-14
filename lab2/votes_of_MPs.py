@@ -6,11 +6,11 @@ def get_data_matrix():
     # mpparty.dat: 352 single column data (0-7) which party
     # mpsex.dat: 351 single column data (0,1) 0 - male, 1-female
     # votes.dat: one line of many values (0, 0.5, 1)
-    with open("data_lab2/votes.dat", "r") as binary_file:
+
+    with open("data_lab2/mpsex.dat", "r") as binary_file:
         # Read the whole file at once
-        data = binary_file.read()
-    data2 = data.split(",")
-    data_matrix = np.zeros((32,84))
+        data = file.readlines()
+    data_matrix = np.zeros((1,349))
     for i in range(data_matrix.shape[0]-1):
         for j in range(data_matrix.shape[1] - 1):
             position = i*data_matrix.shape[1] + j
