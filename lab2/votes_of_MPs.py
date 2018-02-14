@@ -1,9 +1,9 @@
 import numpy as np
 
 def get_data_matrix():
-    # mpdistrict.dat: 349 column data (1-29) 
-    # mpnames.dat: 
-    # mpparty.dat: 
+    # mpdistrict.dat: 349 single column data (1-29) 
+    # mpnames.dat: Just the 349 names
+    # mpparty.dat: 352 single column data ()
     # mpsex.dat: 
     # votes.dat: 
     with open("data_lab2/votes.dat", "r") as binary_file:
