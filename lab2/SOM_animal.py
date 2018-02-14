@@ -81,7 +81,7 @@ def main():
             #    for y in range(net.shape[1]):
                 w = net[x].reshape(84, 1)
                 # get the 2-D distance (again, not the actual Euclidean distance)
-                w_dist = np.sum((x - bmu_idx) ** 2)
+                w_dist = np.sum((x - bmu_idx) ** 2)                                        
                 # if the distance is within the current neighbourhood radius
                 if w_dist <= r**2:
                     # calculate the degree of influence (based on the 2-D distance)
@@ -102,7 +102,7 @@ def main():
     #print(names)
     #names2 = names.split("\t\n")
     pos = []
-    idx_names=[]
+    idx_names = []
     for i in range(len(animals_data)):
         row_p = animals_data[i][:]
         bmu, bmu_idx = find_bmu(row_p, net)
