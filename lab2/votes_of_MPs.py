@@ -3,9 +3,9 @@ import numpy as np
 def get_data_matrix():
     # mpdistrict.dat: 349 single column data (1-29) 
     # mpnames.dat: Just the 349 names
-    # mpparty.dat: 352 single column data ()
-    # mpsex.dat: 
-    # votes.dat: 
+    # mpparty.dat: 352 single column data (0-7) which party
+    # mpsex.dat: 351 single column data (0,1) 0 - male, 1-female
+    # votes.dat: one line of many values (0, 0.5, 1)
     with open("data_lab2/votes.dat", "r") as binary_file:
         # Read the whole file at once
         data = binary_file.read()
