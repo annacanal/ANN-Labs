@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.neural_network import MLPRegressor
 
 def datashuffler(train, test, target_1, test_target_1, target_2, test_target_2):
 
@@ -33,7 +34,6 @@ def data(noise):
     test_target_1 = sin_function(test)
     target_2 = square_function(train)
     test_target_2 = square_function(test)
-
 
 
     return train, test, target_1, target_2, test_target_1, test_target_2
@@ -155,7 +155,7 @@ def main():
 
                     print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror/len(train))
 
-    
+
     # prediction = np.dot(phi_vecs,weights)
     # name = type +" approximation, delta rule"
     # plt.title(name)
