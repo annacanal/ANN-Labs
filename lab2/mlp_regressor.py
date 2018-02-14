@@ -80,7 +80,6 @@ def main():
         mlp_error = 0
         for k in range(len(target)):
             mlp_error += np.absolute((target[k]-y_test[k]))
-        
         mlp_error = mlp_error/len(target)
         print(mlp_error)
     #         mlp_errors.append(mlp_error)
