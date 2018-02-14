@@ -128,10 +128,18 @@ def main():
     init_radius = 5
     # radius decay parameter
     time_constant = epochs / np.log(init_radius)
+<<<<<<< HEAD
+
+    # Learning
+    for i in range(epochs):
+        # for each MP
+        for j in range((votes_data.shape[b0])):      #349
+=======
     # Learning
     for i in range(epochs):
         # for each MP
         for j in range((votes_data.shape[0])):
+>>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
             row_p = votes_data[j][:]
             bmu, bmu_idx = find_bmu(row_p, net)
 
@@ -158,10 +166,25 @@ def main():
                         # commit the new weight
                         net[x][y] = new_w
 
+<<<<<<< HEAD
 
     #display the results for parties
     ax = plt.subplot(111)
     plt.title("Votes according to party")
+=======
+    #display the results
+<<<<<<< HEAD
+    posx = []
+    posy = []
+    for i in range(votes_data.shape[0]):
+        row_p = votes_data[i][:]
+        bmu, bmu_idx = find_bmu(row_p, net)
+        posx.append(bmu_idx[0])
+        posy.append(bmu_idx[1])
+
+    plt.scatter(posx, posy)
+=======
+>>>>>>> d3e9139be1e13272ad2d51f563e4ce6a6333fd07
     parties = set(party_matrix[0][:])
     parties = list(parties)
     for prt in range(len(parties)):
@@ -175,11 +198,17 @@ def main():
 
                 posx.append(bmu_idx[0])
                 posy.append(bmu_idx[1])
+<<<<<<< HEAD
         clr,lbl = get_party_color(prt)
         ax.scatter(posx, posy, color = clr, label = lbl, alpha=0.7)
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     ax.legend(loc = 'center left', bbox_to_anchor=(1, 0.5))
+=======
+        clr = get_party_color(prt)
+        plt.scatter(posx, posy, color = clr, alpha=0.7)
+>>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
+>>>>>>> d3e9139be1e13272ad2d51f563e4ce6a6333fd07
     plt.show()
     plt.clf()
 
