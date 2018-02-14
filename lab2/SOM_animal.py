@@ -1,7 +1,4 @@
 import numpy as np
-import numpy.matlib
-import matplotlib.pyplot as plt
-
 
 def get_data_matrix():
     with open("data_lab2/animals.dat", "r") as binary_file:
@@ -16,29 +13,35 @@ def get_data_matrix():
 
     return data_matrix
 
+def get_animal_names():
+    with open("data_lab2/animalnames.txt", "r") as f:
+        # Read the whole file at once
+        names = f.readlines()
+    names = [x.strip() for x in names]
+    return names
+
 def find_bmu(t, net):
     """
         Find the best matching unit for a given vector, t, in the SOM
         Returns: a (bmu, bmu_idx) tuple where bmu is the high-dimensional BMU
                  and bmu_idx is the index of this vector in the SOM
     """
-    #bmu_idx = np.array([0, 0])
     bmu_idx = []
     # set the initial minimum distance to a huge number
     min_dist = np.iinfo(np.int).max
     # calculate the high-dimensional distance between each neuron and the input
     for x in range(net.shape[0]):
         #for y in range(net.shape[1]):
-        w = net[x]#.reshape(84, 1)
+        w = net[x].reshape(1,84)
         # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
         sq_dist = np.sum((w - t) ** 2)
         if sq_dist < min_dist:
             min_dist = sq_dist
             #bmu_idx = np.array([x, y])
-            bmu_idx=x
+            bmu_idx = x
     # get vector corresponding to bmu_idx
     #bmu = net[bmu_idx[0], bmu_idx[1], :].reshape(m, 1)
-    bmu = net[bmu_idx]#.reshape(84, 1)
+    bmu = net[bmu_idx].reshape(84,1)
     # return the (bmu, bmu_idx) tuple
     return (bmu, bmu_idx)
 
@@ -55,14 +58,10 @@ def main():
     animals_data = get_data_matrix()
     epochs = 20
     init_learning_rate = 0.2
-    # establish size variables based on data
-    m = animals_data.shape[0]
-    n = animals_data.shape[1]
     # weight matrix (i.e. the SOM) needs to be one m-dimensional vector for each neuron in the SOM
     net = np.random.random((100, 84))
-
     # initial neighbourhood radius
-    init_radius = max(100, 84) / 2
+    init_radius = 50
     # radius decay parameter
     time_constant = epochs / np.log(init_radius)
     #Learning
@@ -79,7 +78,7 @@ def main():
             # by a factor proportional to their 2-D distance from the BMU
             for x in range(net.shape[0]):
             #    for y in range(net.shape[1]):
-                w = net[x].reshape(84, 1)
+                w = net[x].reshape(1,84)
                 # get the 2-D distance (again, not the actual Euclidean distance)
                 w_dist = np.sum((x - bmu_idx) ** 2)
                 # if the distance is within the current neighbourhood radius
@@ -91,16 +90,10 @@ def main():
                     # where delta = input vector (t) - old w
                     new_w = w + (l * influence * (row_p - w))
                     # commit the new weight
-                    net[x] = new_w[0]#.reshape(1,84)
+                    net[x] = new_w[0].reshape(1,84)
 
-    # Fit
-
-    with open("data_lab2/animalnames.txt", "r") as f:
-        # Read the whole file at once
-        names = f.readlines()
-    names = [x.strip() for x in names]
-    #print(names)
-    #names2 = names.split("\t\n")
+    # Find index for species
+    names = get_animal_names()
     pos = []
     idx_names=[]
     for i in range(len(animals_data)):
@@ -109,15 +102,15 @@ def main():
         idx_names.append(i)
         pos.append(bmu_idx)
 
-    ordered_pos = sorted(zip(pos, idx_names))
 
+    ordered_pos = sorted(zip(pos, idx_names))
     print(ordered_pos)
     names_order=[]
     for i in range(len(names)):
         pos = ordered_pos[i][1]
         names_order.append(names[pos])
-
-    print(names_order)
+        print(names_order[i])
+    #print(names_order)
 
 if __name__ == "__main__":
     main()
