@@ -30,12 +30,44 @@ def get_data_matrix():
 
     return party_matrix, gender_matrix, district_matrix, vote_matrix
 
+<<<<<<< HEAD
 # def get_animal_names():
 #     with open("data_lab2/animalnames.txt", "r") as f:
 #         # Read the whole file at once
 #         names = f.readlines()
 #     names = [x.strip() for x in names]
 #     return names
+=======
+def get_party_color(party):
+    if party == 0:
+        color = 'grey'
+    elif party == 1:
+        color = 'red'
+    elif party == 2:
+        color = 'firebrick'
+    elif party == 3:
+        color = 'skyblue'
+    elif party == 4:
+        color = 'dodgerblue'
+    elif party == 5:
+        color = 'purple'
+    elif party == 6:
+        color = 'maroon'
+    elif party == 7:
+        color = 'lightcoral'
+    else:
+        print(party, "WRONGPARTY")
+        exit(1)
+
+    return(color)
+
+def get_animal_names():
+    with open("data_lab2/animalnames.txt", "r") as f:
+        # Read the whole file at once
+        names = f.readlines()
+    names = [x.strip() for x in names]
+    return names
+>>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
 
 def find_bmu(t, net):
     """
@@ -82,11 +114,18 @@ def main():
     init_radius = 5
     # radius decay parameter
     time_constant = epochs / np.log(init_radius)
+<<<<<<< HEAD
 
     # Learning
     for i in range(epochs):
         # for each MP
         for j in range((votes_data.shape[b0])):      #349
+=======
+    # Learning
+    for i in range(epochs):
+        # for each MP
+        for j in range((votes_data.shape[0])):
+>>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
             row_p = votes_data[j][:]
             bmu, bmu_idx = find_bmu(row_p, net)
 
@@ -114,6 +153,7 @@ def main():
                         net[x][y] = new_w
 
     #display the results
+<<<<<<< HEAD
     posx = []
     posy = []
     for i in range(votes_data.shape[0]):
@@ -123,6 +163,23 @@ def main():
         posy.append(bmu_idx[1])
 
     plt.scatter(posx, posy)
+=======
+    parties = set(party_matrix[0][:])
+    parties = list(parties)
+    for prt in range(len(parties)):
+        posx = []
+        posy = []
+        for i in range(votes_data.shape[0]):
+            partidx = parties.index(party_matrix[0][i])
+            if partidx == prt:
+                row_p = votes_data[i][:]
+                bmu, bmu_idx = find_bmu(row_p, net)
+
+                posx.append(bmu_idx[0])
+                posy.append(bmu_idx[1])
+        clr = get_party_color(prt)
+        plt.scatter(posx, posy, color = clr, alpha=0.7)
+>>>>>>> 6f70304b32f73aaec3ceaf2734041b46c905f37c
     plt.show()
 
         #
