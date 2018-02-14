@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.matlib
 import matplotlib.pyplot as plt
 
 def get_data_matrix():
@@ -49,67 +48,70 @@ def calculate_influence(distance, radius):
 
 def main():
     cities_data_matrix = get_data_matrix()
-    epochs = 800
-    init_learning_rate = 0.2
+    #epochs = 5
     # weight matrix (i.e. the SOM) needs to be one m-dimensional vector for each neuron in the SOM
     net = np.random.random((10, 2))
-    # initial neighbourhood radius
-    init_radius = 2
-    # radius decay parameter
-    time_constant = epochs / np.log(init_radius)
 
     #Learning
-    for i in range(epochs):
-        for j in range(len(cities_data_matrix)):
-            row_p = cities_data_matrix[j][:]
+    epochs_arr = np.arange(1,15,1)
+    for epochs in epochs_arr:
+        init_learning_rate = 0.2
+        # initial neighbourhood radius
+        init_radius = 2
+        # radius decay parameter
+        time_constant = epochs / np.log(init_radius)
+        for i in range(epochs):
+            for j in range(len(cities_data_matrix)):
+                row_p = cities_data_matrix[j][:]
+                bmu, bmu_idx = find_bmu(row_p, net)
+
+                r = decay_radius(init_radius, i, time_constant)
+                l = decay_learning_rate(init_learning_rate, i, epochs)
+                # now we know the BMU, update its
+                # weight vector to move closer to input
+                # and move its neighbours in 2-D space closer
+                # by a factor proportional to their 2-D distance from the BMU
+                for x in range(net.shape[0]):
+                #    for y in range(net.shape[1]):
+                    w = net[x].reshape(1, 2)
+                    # get the 2-D distance (again, not the actual Euclidean distance)
+                    w_dist = np.sum((x - bmu_idx) ** 2)
+                    # if the distance is within the current neighbourhood radius
+                    if w_dist <= r**2:
+                        # calculate the degree of influence (based on the 2-D distance)
+                        influence = calculate_influence(w_dist, r)
+                        # now update the neuron's weight using the formula:
+                        # new w = old w + (learning rate * influence * delta)
+                        # where delta = input vector (t) - old w
+                        new_w = w + (l * influence * (row_p - w))
+                        # commit the new weight
+                        net[x] = new_w[0].reshape(1,2)
+
+        # Find index for species
+        pos = []
+        idx_cities = []
+        for i in range(len(cities_data_matrix)):
+            row_p = cities_data_matrix[i][:]
             bmu, bmu_idx = find_bmu(row_p, net)
+            idx_cities.append(i)
+            pos.append(bmu_idx)
+        ordered_pos = sorted(zip(pos, idx_cities))
+        #print(ordered_pos)
 
-            r = decay_radius(init_radius, i, time_constant)
-            l = decay_learning_rate(init_learning_rate, i, epochs)
-            # now we know the BMU, update its
-            # weight vector to move closer to input
-            # and move its neighbours in 2-D space closer
-            # by a factor proportional to their 2-D distance from the BMU
-            for x in range(net.shape[0]):
-            #    for y in range(net.shape[1]):
-                w = net[x].reshape(1, 2)
-                # get the 2-D distance (again, not the actual Euclidean distance)
-                w_dist = np.sum((x - bmu_idx) ** 2)
-                # if the distance is within the current neighbourhood radius
-                if w_dist <= r**2:
-                    # calculate the degree of influence (based on the 2-D distance)
-                    influence = calculate_influence(w_dist, r)
-                    # now update the neuron's weight using the formula:
-                    # new w = old w + (learning rate * influence * delta)
-                    # where delta = input vector (t) - old w
-                    new_w = w + (l * influence * (row_p - w))
-                    # commit the new weight
-                    net[x] = new_w[0].reshape(1,2)
-
-    # Find index for species
-    pos = []
-    idx_cities = []
-    for i in range(len(cities_data_matrix)):
-        row_p = cities_data_matrix[i][:]
-        bmu, bmu_idx = find_bmu(row_p, net)
-        idx_cities.append(i)
-        pos.append(bmu_idx)
-    ordered_pos = sorted(zip(pos, idx_cities))
-    print(ordered_pos)
-
-    cities1 = []
-    cities2 = []
-    for i in range(len(cities_data_matrix)):
-        pos = ordered_pos[i][1]
-        #print(pos)
-        cities1.append(cities_data_matrix[pos][0])
-        cities2.append(cities_data_matrix[pos][1])
-        #plt.plot(cities_data_matrix[pos][0],cities_data_matrix[pos][1])
-    #print(cities[][0])
-    #for i in range(10):
-    plt.scatter(cities1,cities2)
-    plt.plot(cities1, cities2)
-    plt.show()
+        cities1 = []
+        cities2 = []
+        for i in range(len(cities_data_matrix)):
+            pos = ordered_pos[i][1]
+            #print(pos)
+            cities1.append(cities_data_matrix[pos][0])
+            cities2.append(cities_data_matrix[pos][1])
+            #plt.plot(cities_data_matrix[pos][0],cities_data_matrix[pos][1])
+        #print(cities[][0])
+        #for i in range(10):
+        plt.scatter(cities1,cities2, color='r')
+        plt.plot(cities1, cities2)
+        plt.title("City tour with epochs = "+str(epochs))
+        plt.show()
 
 if __name__ == "__main__":
     main()
