@@ -229,8 +229,45 @@ def main():
         #print(legend, "error:", np.mean(errors))
 
 
+    #train prediction
+    #prediction = np.dot(phi_vecs,weights)
+
+    prediction1=[]
+    prediction2=[]
+    prediction_test1=[]
+    prediction_test2=[]
+    train_target1=[]
+    train_target2=[]
+    test_target1=[]
+    test_target2=[]
+    for i in range(len(prediction)):
+        prediction1.append(prediction[i][0])
+        prediction2.append(prediction[i][1])
+    for i in range(len(prediction_test)):
+        prediction_test1.append(prediction_test[i][0])
+        prediction_test2.append(prediction_test[i][1])
+
+    for i in range(len(train_target)):
+        train_target1.append(train_target[i][0])
+        train_target2.append(train_target[i][1])
+    for i in range(len(test_target)):
+        test_target1.append(test_target[i][0])
+        test_target2.append(test_target[i][1])
 
 
+    name = "train approximation, CL with nodes = "+str(nodes)
+    plt.title(name)
+    plt.scatter(prediction1,prediction2,s=2.5, label="Prediction")
+    plt.scatter(train_target1,train_target2, s=2.5, label="Target")
+    plt.legend()
+    plt.show()
+    #test prediction
+    name = "test approximation, CL with nodes = " + str(nodes)
+    plt.title(name)
+    plt.scatter(prediction_test1,prediction_test2, s=2.5, label="Prediction")
+    plt.scatter(test_target1,test_target2, s=2.5, label="Target")
+    plt.legend()
+    plt.show()
 
     # plt.title('Convergence')
     # plt.xlabel('Epochs')
