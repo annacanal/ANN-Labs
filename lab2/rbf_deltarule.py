@@ -109,10 +109,16 @@ def main():
     sigma_value=0.2
     nodes= 60
 
-    for typ in ['sin']:#['sin', 'square']:
-        for sigma_value in [0.35, 0.4, 0.45]:# [0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 1]:
-            for nodes in [50, 63]:#[10, 20, 30, 40, 50, 63]:
-                for mutyp in ['rnd', 'mean']:
+
+    for nodes in [27, 40, 50, 63]:#[10, 20, 30, 40, 50, 63]:
+        errors_sin_train = []
+        errors_square_train = []
+        errors_sin_test = []
+        errors_square_test = []
+        for sigma_value in [0.2]:# [0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 1]:
+            for typ in ['sin', 'square']:
+                #for mutyp in ['rnd', 'mean']:
+                for mutyp in ['mean']:
 
                     noise=1 #noise=0 without noise, noise=1 for a gaussian noise
                     train, test, target_1, target_2, test_target_1, test_target_2 = data(noise)
@@ -129,48 +135,100 @@ def main():
                     # plt.plot(target_2)
                     # plt.show()
                     error_sum = 0
-                    errors = []
+                    #errors = []
+
+                    #errors_test = []
                     epochs = 2000
                     phi_vecs =[]
+                    phi_vecs_test=[]
 
                     for i in range(epochs):
                         train, test, target_1, test_target_1, target_2, test_target_2 = datashuffler(train, test, target_1, test_target_1, target_2, test_target_2)
 
-                        sumerror = 0
+                        sumerror_sin = 0
+                        sumerror_square=0
+                        sumerror_sin_test = 0
+                        sumerror_square_test=0
+
                         for j in range(len(train)):
                             phi = phi_vector(train[j], mu, sigma)
+                            phi_test= phi_vector(test[j], mu, sigma)
                             if i==epochs-1:
                                 phi_vecs.append(phi)
+                                phi_vecs_test.append(phi_test)
                             if typ == 'sin':
                                 target = target_1
+                                target_test= test_target_1
+                                error_sin_train = error_function(target[j], phi, weights)
+                                error= error_sin_train
+                                error_sin_test = error_function(target_test[j], phi, weights)
                             if typ == 'square':
                                 target = target_2
-                            error = error_function(target[j], phi, weights)
+                                target_test = test_target_2
+                                error_square_train = error_function(target[j], phi, weights)
+                                error_square_test = error_function(target_test[j], phi, weights)
+                                error = error_square_train
+
                             deltaW = eta*error*phi
                             weights = weights + deltaW
-                            sumerror += (1/2)*error**2
-
+                            if typ == 'sin':
+                                sumerror_sin += (1/2)*error_sin_train**2
+                                sumerror_sin_test += (1 / 2) * error_sin_test ** 2
+                            if typ == 'square':
+                                sumerror_square += (1 / 2) * error_square_train ** 2
+                                sumerror_square_test += (1 / 2) * error_square_test ** 2
                             # e =  np.sqrt((np.sum(error*error))) / len(error)
-                        errors.append(sumerror/len(train))
 
-                    print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror/len(train))
+                        if typ == 'sin':
+                            errors_sin_train.append(sumerror_sin / len(train))
+                            errors_sin_test.append(sumerror_sin_test / len(test))
+                        if typ == 'square':
+                            errors_square_train.append(sumerror_square / len(train))
+                            errors_square_test.append(sumerror_square_test / len(test))
+
+                    if typ == 'sin':
+                        print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror_sin/len(train))
+                        print("type:", typ, "mus init type:", mutyp, "sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror_sin_test / len(test))
+                    if typ == 'square':
+                        print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror_square/len(train))
+                        print("type:", typ, "mus init type:", mutyp, "sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror_square_test / len(test))
+                    # #train prediction
+                    # prediction = np.dot(phi_vecs,weights)
+                    # name = typ +" train approximation, delta rule with nodes = "+str(nodes)
+                    # plt.title(name)
+                    # plt.scatter(train, prediction,s=2.5, label="Prediction")
+                    # plt.scatter(train, target, s=2.5, label="Target")
+                    # plt.legend()
+                    # plt.show()
+                    # #test prediction
+                    # prediction = np.dot(phi_vecs_test, weights)
+                    # name = typ + " test approximation, delta rule with nodes = " + str(nodes)
+                    # plt.title(name)
+                    # plt.scatter(test, prediction, s=2.5, label="Prediction")
+                    # plt.scatter(test, target_test, s=2.5, label="Target")
+                    # plt.legend()
+                    # plt.show()
+
+        iterations = np.arange(epochs)
+        name= "Train error/iteration delta rule with nodes = "+str(nodes)
+        plt.title(name)
+        plt.plot(iterations, errors_sin_train, label="Sinus Error")
+        plt.plot(iterations, errors_square_train, label="Square Error")
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+        plt.show()
+
+        name = "Test error/iteration delta rule with nodes = " + str(nodes)
+        plt.title(name)
+        plt.plot(iterations, errors_sin_test, label="Sinus Error")
+        plt.plot(iterations, errors_square_test, label="Square Error")
+        plt.xlabel('Epochs')
+        plt.ylabel('Error')
+        plt.legend()
+        plt.show()
 
 
-    # prediction = np.dot(phi_vecs,weights)
-    # name = type +" approximation, delta rule"
-    # plt.title(name)
-    # plt.scatter(train, prediction,s=2.5, label="Prediction")
-    # plt.scatter(train, target, s=2.5, label="Target")
-    # plt.legend()
-    # plt.show()
-    #
-    # iterations = np.arange(epochs)
-    # name= "Error/iteration delta rule"
-    # plt.title(name)
-    # plt.plot(iterations, errors,'blue')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Error')
-    # plt.show()
 
 
 if __name__ == "__main__":
