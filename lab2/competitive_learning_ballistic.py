@@ -67,8 +67,8 @@ def phi_function(x, mu, sigma):
     return phi
 
 def phi_vector(xi, mu, sigma):
-    phi_vector = np.zeros(len(mu))
-    for i in range(len(mu)):
+    phi_vector = np.zeros(mu.shape)
+    for i in range(mu.shape[0]):
         k = phi_function(xi, mu[i], sigma)
         phi_vector[i] = k
     return phi_vector
@@ -188,7 +188,7 @@ def main():
     eta = 0.001
     sigma_value=0.4
     epochs = 1#2000
-    nodes = (10,10)
+    nodes = (10)
 
     train, train_target, test, test_target = open_data()
 
@@ -206,7 +206,7 @@ def main():
     elif mutyp == 'cl':
         #Competitive learning
         netsize = nodes+(2,)
-        net = np.random.random((10,10,2))
+        net = np.random.random((4,4,2))
         net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
         marker = '>'
         legend = 'CL'
@@ -219,6 +219,8 @@ def main():
         print("WRONG MUTYP")
         exit(1)
 
+    plt.scatter(net.shape[1])
+
     # mu = net.flatten()
     mu = net
 
@@ -227,9 +229,9 @@ def main():
 
     for i in range(epochs):
         sumerror = 0
-        for j in range(len(train)):
+        for j in range(train.shape[0]):
             phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(target_1[j], phi, weights)
+            error = error_function(train_target[j], phi, weights)
             deltaW = eta*error*phi
             weights = weights + deltaW
             sumerror += (1/2)*error**2
