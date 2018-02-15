@@ -75,7 +75,6 @@ def chunkify(seq, num):
             plus -= 1
         out.append(seq[int(first):int(last)])
         howmany += (last - first)
-
     return out
 
 def init_mus(nodes_number, train):
@@ -142,7 +141,6 @@ def main():
             no_nums.append(nodes_number)
             errors_sin.append(error_sin)
             errors_square.append(error_square)
-
 
         except numpy.linalg.linalg.LinAlgError as err:
             print("Exception ", err)

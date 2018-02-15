@@ -97,7 +97,7 @@ def main():
     sigma_value=0.2
     nodes= 20
  
-    epochs = 2000
+    epochs = 1000
     init_learning_rate = 0.2
     init_radius = 50
     time_constant = epochs / np.log(init_radius)
@@ -133,7 +133,7 @@ def main():
             error = error_function(target_1[j], phi, weights)
             deltaW = eta*error*phi
             weights = weights + deltaW
-            sumerror += (1/2)*error**2
+            sumerror += 1/2*error**2
         error = sumerror/len(train)
     print(error)
         

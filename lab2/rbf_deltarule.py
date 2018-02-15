@@ -152,7 +152,6 @@ def main():
 
                             # e =  np.sqrt((np.sum(error*error))) / len(error)
                         errors.append(sumerror/len(train))
-
                     print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror/len(train))
 
 
