@@ -108,17 +108,17 @@ def main():
 
     #Competitative learning: 
     for i in range(epochs):
-        row_p = train
-        bmu, bmu_idx = find_bmu(row_p, net)
-        r = decay_radius(init_radius, i, time_constant)
-        l = decay_learning_rate(init_learning_rate, i, epochs)
-        for x in range(net.shape[0]): # number of nodes
-            w = net[x]
-            w_dist = np.sum((x - bmu_idx) ** 2)                                        
-            if w_dist <= r**2:
-                influence = calculate_influence(w_dist, r)
-                new_w = w + (l * influence * (row_p - w))
-                net[x] = new_w[0]
+        for j in range(len(train)):
+            bmu, bmu_idx = find_bmu(train[j], net)
+            r = decay_radius(init_radius, i, time_constant)
+            l = decay_learning_rate(init_learning_rate, i, epochs)
+            for x in range(net.shape[0]): # number of nodes
+                w = net[x]
+                w_dist = np.sum((x - bmu_idx) ** 2)
+                if w_dist <= r**2:
+                    influence = calculate_influence(w_dist, r)
+                    new_w = w + (l * influence * (train[j] - w))
+                    net[x] = new_w[0]
     
     mu = net.flatten()  #initialization weights for the delta rule.
     phi_vecs = []
