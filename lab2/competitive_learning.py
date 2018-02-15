@@ -90,17 +90,8 @@ def decay_learning_rate(initial_learning_rate, i, epochs):
 def calculate_influence(distance, radius):
     return np.exp(-distance / (2* (radius**2)))
 
-<<<<<<< HEAD
-def main():
-    eta = 0.0001
-    sigma_value=0.2
-    nodes= 20
- 
-    epochs = 1000
-=======
 def cl_for_mu_placement(epochs, train, net):
     init_radius = 70
->>>>>>> 1d5421c37b01b457ef14a6268b84cee25ecf2a36
     init_learning_rate = 0.2
     time_constant = epochs / np.log(init_radius)
 
@@ -124,29 +115,6 @@ def vanillacl_for_mu_placement(epochs, train, net):
     for i in range(epochs):
         l = decay_learning_rate(init_learning_rate, i, epochs)
         for j in range(len(train)):
-<<<<<<< HEAD
-            phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(target_1[j], phi, weights)
-            deltaW = eta*error*phi
-            weights = weights + deltaW
-            sumerror += 1/2*error**2
-        error = sumerror/len(train)
-    print(error)
-        
-
-    # prediction = np.dot(phi_vecs,weights)
-    # name = type +" approximation, delta rule"
-    # plt.title(name)
-    # plt.scatter(train, prediction,s=2.5, label="Prediction")
-    # plt.scatter(train, target, s=2.5, label="Target")
-    # plt.legend()
-    # plt.show()
-    #
-    # iterations = np.arange(epochs)
-    # name= "Error/iteration delta rule"
-    # plt.title(name)
-    # plt.plot(iterations, errors,'blue')
-=======
             bmu, bmu_idx = find_bmu(train[j], net)
 
             #update only the winner node
@@ -267,7 +235,6 @@ def main():
 
 
     # plt.title('Convergence')
->>>>>>> 1d5421c37b01b457ef14a6268b84cee25ecf2a36
     # plt.xlabel('Epochs')
     # plt.ylabel('Error')
     # # plt.xlim((0,1500))
