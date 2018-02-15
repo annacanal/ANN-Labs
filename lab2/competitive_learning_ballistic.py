@@ -24,7 +24,7 @@ def open_data():
 
 
 def weights_init(x):
-    weights = np.random.rand(len(x))
+    weights = np.random.random((100, 2))
     return weights
 
 def sin_function(x):
@@ -45,8 +45,14 @@ def phi_vector(xi, mu, sigma):
     return phi_vector
 
 def error_function(target, phi_vector, weights):
-    error= (target - np.matmul(phi_vector,np.transpose(weights)))
-    return error
+    # errors = np.zeros((len(target[0]), len(target[1])))
+    errors = []
+    for i in range(len(target[0])): #10
+        # for j in range(len(target[1])): #2    
+        error= target[i] - phi_vector[i]*weights[i]
+        errors.append(error)
+    print(errors)
+    return errors
 
 def find_bmu(t, net):
     """
@@ -175,7 +181,7 @@ def main():
         legend = 'Manual'
     elif mutyp == 'cl':
         #Competitive learning
-        net = np.random.random((nodes, train.shape[1]))
+        net = np.random.random((nodes, train.shape[1], train.shape[0]))
         net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
         marker = '>'
         legend = 'CL'
@@ -192,13 +198,12 @@ def main():
 
     # mu = net.flatten()
     mu = net
-
     #Delta rule:
     weights = weights_init(mu)
 
     for i in range(epochs):
         sumerror = 0
-        for j in range(train.shape[0]):
+        for j in range(train.shape[0]): #10
             phi = phi_vector(train[j], mu, sigma_value)
             error = error_function(train_target[j], phi, weights)
             deltaW = eta*error*phi
