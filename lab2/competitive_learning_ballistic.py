@@ -22,35 +22,6 @@ def open_data():
     return (train, train_target, test, test_target)
 
 
-def datashuffler(train, test, target_1, test_target_1):
-
-    # Shuffle data
-    index_train = np.random.permutation(len(train))
-    index_test = np.random.permutation(len(test))
-    #np.random.shuffle(train)
-    train = train[index_train]
-    test=test[index_test]
-    target_1 = target_1[index_train]
-    test_target_1=test_target_1[index_test]
-
-    return (train, test, target_1, test_target_1)
-
-
-def data(noise):
-    train = np.arange(0, 2*np.pi, 0.1)
-    test = np.arange(0.05, 2*np.pi, 0.1)
-
-    #Adding noise with variance=0.1
-    if (noise==1):
-        noise_train = np.random.normal(0, 0.1, len(train))
-        noise_test = np.random.normal(0, 0.1, len(test))
-        train = train + noise_train
-        test = test + noise_test
-
-    target_1 = sin_function(train)
-    test_target_1 = sin_function(test)
-
-    return train, test, target_1, test_target_1
 
 def weights_init(x):
     weights = np.random.rand(len(x))
@@ -63,14 +34,14 @@ def sin_function(x):
     return y
 
 def phi_function(x, mu, sigma):
+    k = x-mu
     phi = np.exp(-(x-mu)**2/(2*sigma**2))
     return phi
 
 def phi_vector(xi, mu, sigma):
-    phi_vector = np.zeros(mu.shape)
+    phi_vector = np.zeros((mu.shape[0], mu.shape[1]))
     for i in range(mu.shape[0]):
-        k = phi_function(xi, mu[i], sigma)
-        phi_vector[i] = k
+        phi_vector[i] = phi_function(xi, mu[i], sigma)
     return phi_vector
 
 def error_function(target, phi_vector, weights):
@@ -88,14 +59,14 @@ def find_bmu(t, net):
     min_dist = np.iinfo(np.int).max
     # calculate the high-dimensional distance between each neuron and the input
     for x in range(net.shape[0]):
-        for y in range(net.shape[1]):
-            w = net[x][y]
-            # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
-            sq_dist = np.sum(np.square(w - t))
-            if sq_dist < min_dist:
-                min_dist = sq_dist
-                #bmu_idx = np.array([x, y])
-                bmu_idx = x
+        #for y in range(net.shape[1]):
+        w = net[x]
+        # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
+        sq_dist = np.sum((w - t) ** 2)
+        if sq_dist < min_dist:
+            min_dist = sq_dist
+            #bmu_idx = np.array([x, y])
+            bmu_idx = x
     # get vector corresponding to bmu_idx
     #bmu = net[bmu_idx[0], bmu_idx[1], :].reshape(m, 1)
     bmu = net[bmu_idx]
@@ -112,15 +83,14 @@ def calculate_influence(distance, radius):
     return np.exp(-distance / (2* (radius**2)))
 
 def cl_for_mu_placement(epochs, train, net):
-    init_radius = 5
+    init_radius = 70
     init_learning_rate = 0.2
     time_constant = epochs / np.log(init_radius)
 
     for i in range(epochs):
         r = decay_radius(init_radius, i, time_constant)
         l = decay_learning_rate(init_learning_rate, i, epochs)
-        for j in range(train.shape[0]):
-            # datapoint = np.array([float(i) for i in train[j]])
+        for j in range(len(train)):
             bmu, bmu_idx = find_bmu(train[j], net)
             for x in range(net.shape[0]): # number of nodes
                 w = net[x]
@@ -188,7 +158,7 @@ def main():
     eta = 0.001
     sigma_value=0.4
     epochs = 1#2000
-    nodes = (10)
+    nodes = 10
 
     train, train_target, test, test_target = open_data()
 
@@ -205,8 +175,7 @@ def main():
         legend = 'Manual'
     elif mutyp == 'cl':
         #Competitive learning
-        netsize = nodes+(2,)
-        net = np.random.random((4,4,2))
+        net = np.random.random((nodes, train.shape[1]))
         net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
         marker = '>'
         legend = 'CL'
@@ -219,7 +188,7 @@ def main():
         print("WRONG MUTYP")
         exit(1)
 
-    plt.scatter(net.shape[1])
+    #plt.scatter(net.shape[1])
 
     # mu = net.flatten()
     mu = net
