@@ -24,7 +24,11 @@ def open_data():
 
 
 def weights_init(x):
+<<<<<<< HEAD
     weights = np.random.random((100, 2))
+=======
+    weights = np.random.rand(x.shape[0])
+>>>>>>> e1b628badefd58e60dee0643e8760dd96df4ee38
     return weights
 
 def sin_function(x):
@@ -45,6 +49,7 @@ def phi_vector(xi, mu, sigma):
     return phi_vector
 
 def error_function(target, phi_vector, weights):
+<<<<<<< HEAD
     # errors = np.zeros((len(target[0]), len(target[1])))
     errors = []
     for i in range(len(target[0])): #10
@@ -53,6 +58,10 @@ def error_function(target, phi_vector, weights):
         errors.append(error)
     print(errors)
     return errors
+=======
+    error= target - np.dot(weights,phi_vector)
+    return error
+>>>>>>> e1b628badefd58e60dee0643e8760dd96df4ee38
 
 def find_bmu(t, net):
     """
@@ -163,7 +172,7 @@ def main():
                     # "cl" = competitive learning, "vcl" = vanilla competitive learning
     eta = 0.001
     sigma_value=0.4
-    epochs = 1#2000
+    epochs = 1000
     nodes = 10
 
     train, train_target, test, test_target = open_data()
@@ -206,7 +215,7 @@ def main():
         for j in range(train.shape[0]): #10
             phi = phi_vector(train[j], mu, sigma_value)
             error = error_function(train_target[j], phi, weights)
-            deltaW = eta*error*phi
+            deltaW = eta*np.dot(error,np.transpose(phi))
             weights = weights + deltaW
             sumerror += (1/2)*error**2
         error = sumerror/len(train)
@@ -216,7 +225,7 @@ def main():
     testerror = 0
     for j in range(len(test)):
         phi = phi_vector(test[j], mu, sigma_value)
-        error = error_function(test_target_1[j], phi, weights)
+        error = error_function(test_target[j], phi, weights)
         testerror += np.abs(error)
     testerror = testerror / len(test)
     print(testerror)
