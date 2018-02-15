@@ -2,6 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPRegressor
 
+def read_data_from_file(name):
+    with open(name, "r") as file:
+        # Read the whole file at once
+        data = file.read()
+        data = data.split('\n')
+        train = []
+        train_target = []
+        for line in data:
+            dt = line.split('\t')
+            train.append([float(i) for i in dt[0].split(' ')])
+            train_target.append([float(i) for i in dt[1].split(' ')])
+
+    return np.array(train), np.array(train_target)
+
+def open_data():
+    train, train_target = read_data_from_file("data_lab2/ballist.dat")
+    test, test_target = read_data_from_file("data_lab2/balltest.dat")
+    return (train, train_target, test, test_target)
+
+
 def datashuffler(train, test, target_1, test_target_1):
 
     # Shuffle data
@@ -47,9 +67,10 @@ def phi_function(x, mu, sigma):
     return phi
 
 def phi_vector(xi, mu, sigma):
-    phi_vector = np.zeros(len(mu))
-    for i in range(len(mu)):
-        phi_vector[i] = phi_function(xi, mu[i], sigma)
+    phi_vector = np.zeros(mu.shape)
+    for i in range(mu.shape[0]):
+        k = phi_function(xi, mu[i], sigma)
+        phi_vector[i] = k
     return phi_vector
 
 def error_function(target, phi_vector, weights):
@@ -67,14 +88,14 @@ def find_bmu(t, net):
     min_dist = np.iinfo(np.int).max
     # calculate the high-dimensional distance between each neuron and the input
     for x in range(net.shape[0]):
-        #for y in range(net.shape[1]):
-        w = net[x]
-        # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
-        sq_dist = np.sum((w - t) ** 2)
-        if sq_dist < min_dist:
-            min_dist = sq_dist
-            #bmu_idx = np.array([x, y])
-            bmu_idx = x
+        for y in range(net.shape[1]):
+            w = net[x][y]
+            # don't bother with actual Euclidean distance, to avoid expensive sqrt operation
+            sq_dist = np.sum(np.square(w - t))
+            if sq_dist < min_dist:
+                min_dist = sq_dist
+                #bmu_idx = np.array([x, y])
+                bmu_idx = x
     # get vector corresponding to bmu_idx
     #bmu = net[bmu_idx[0], bmu_idx[1], :].reshape(m, 1)
     bmu = net[bmu_idx]
@@ -90,24 +111,16 @@ def decay_learning_rate(initial_learning_rate, i, epochs):
 def calculate_influence(distance, radius):
     return np.exp(-distance / (2* (radius**2)))
 
-<<<<<<< HEAD
-def main():
-    eta = 0.0001
-    sigma_value=0.2
-    nodes= 20
- 
-    epochs = 1000
-=======
 def cl_for_mu_placement(epochs, train, net):
-    init_radius = 70
->>>>>>> 1d5421c37b01b457ef14a6268b84cee25ecf2a36
+    init_radius = 5
     init_learning_rate = 0.2
     time_constant = epochs / np.log(init_radius)
 
     for i in range(epochs):
         r = decay_radius(init_radius, i, time_constant)
         l = decay_learning_rate(init_learning_rate, i, epochs)
-        for j in range(len(train)):
+        for j in range(train.shape[0]):
+            # datapoint = np.array([float(i) for i in train[j]])
             bmu, bmu_idx = find_bmu(train[j], net)
             for x in range(net.shape[0]): # number of nodes
                 w = net[x]
@@ -124,29 +137,6 @@ def vanillacl_for_mu_placement(epochs, train, net):
     for i in range(epochs):
         l = decay_learning_rate(init_learning_rate, i, epochs)
         for j in range(len(train)):
-<<<<<<< HEAD
-            phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(target_1[j], phi, weights)
-            deltaW = eta*error*phi
-            weights = weights + deltaW
-            sumerror += 1/2*error**2
-        error = sumerror/len(train)
-    print(error)
-        
-
-    # prediction = np.dot(phi_vecs,weights)
-    # name = type +" approximation, delta rule"
-    # plt.title(name)
-    # plt.scatter(train, prediction,s=2.5, label="Prediction")
-    # plt.scatter(train, target, s=2.5, label="Target")
-    # plt.legend()
-    # plt.show()
-    #
-    # iterations = np.arange(epochs)
-    # name= "Error/iteration delta rule"
-    # plt.title(name)
-    # plt.plot(iterations, errors,'blue')
-=======
             bmu, bmu_idx = find_bmu(train[j], net)
 
             #update only the winner node
@@ -193,81 +183,77 @@ def rnd_init_mus(nodes_number, train):
     return mus
 
 def main():
-    mutyp = 'vcl'   #how nodes are initialized. options: "rnd" = random, "mean" = splitting in chunks and getting the means,
+    mutyp = 'cl'   #how nodes are initialized. options: "rnd" = random, "mean" = splitting in chunks and getting the means,
                     # "cl" = competitive learning, "vcl" = vanilla competitive learning
     eta = 0.001
     sigma_value=0.4
-    epochs = 2000
-    nodes = 30
+    epochs = 1#2000
+    nodes = (10)
 
-    for noise in [0,1]: #noise=0 without noise, noise=1 for a gaussian noise
-        train, test, target_1, test_target_1 = data(noise)  # calc only sin(2x)
-        if noise == 0:
-            lg = ' without noise'
-        else:
-            lg = ' with noise'
+    train, train_target, test, test_target = open_data()
 
+    #errors = []
+    #for times in range(10):
 
-        typs = ['mean', 'vcl', 'cl']
-        for mutyp in typs:
-            errors = []
-            for times in range(10):
+    if mutyp == 'rnd':
+        net = rnd_init_mus(nodes, train)
+        marker = '<'
+        legend = 'Random'
+    elif mutyp == 'mean':
+        net = init_mus(nodes, train)
+        marker = '^'
+        legend = 'Manual'
+    elif mutyp == 'cl':
+        #Competitive learning
+        netsize = nodes+(2,)
+        net = np.random.random((4,4,2))
+        net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
+        marker = '>'
+        legend = 'CL'
+    elif mutyp == 'vcl':
+        #Vanilla competitive learning
+        net = vanillacl_for_mu_placement(epochs, train, np.random.random((nodes, 2))) #2*np.pi *
+        marker = 'v'
+        legend = 'Vanilla CL'
+    else:
+        print("WRONG MUTYP")
+        exit(1)
 
-                if mutyp == 'rnd':
-                    net = rnd_init_mus(nodes, train)
-                    marker = '<'
-                    legend = 'Random'+lg
-                elif mutyp == 'mean':
-                    net = init_mus(nodes, train)
-                    marker = '^'
-                    legend = 'Manual'+lg
-                elif mutyp == 'cl':
-                    #Competitive learning
-                    net = cl_for_mu_placement(epochs, train, np.random.random((nodes, 1))) #2*np.pi *
-                    marker = '>'
-                    legend = 'CL'+lg
-                elif mutyp == 'vcl':
-                    #Vanilla competitive learning
-                    net = vanillacl_for_mu_placement(epochs, train, np.random.random((nodes, 1))) #2*np.pi *
-                    marker = 'v'
-                    legend = 'Vanilla CL'+lg
-                else:
-                    print("WRONG MUTYP")
-                    exit(1)
+    plt.scatter(net.shape[1])
 
-                mu = net.flatten()
+    # mu = net.flatten()
+    mu = net
 
+    #Delta rule:
+    weights = weights_init(mu)
 
-                #Delta rule:
-                weights = weights_init(mu)
+    for i in range(epochs):
+        sumerror = 0
+        for j in range(train.shape[0]):
+            phi = phi_vector(train[j], mu, sigma_value)
+            error = error_function(train_target[j], phi, weights)
+            deltaW = eta*error*phi
+            weights = weights + deltaW
+            sumerror += (1/2)*error**2
+        error = sumerror/len(train)
+    print(error)
 
-                for i in range(epochs):
-                    sumerror = 0
-                    for j in range(len(train)):
-                        phi = phi_vector(train[j], mu, sigma_value)
-                        error = error_function(target_1[j], phi, weights)
-                        deltaW = eta*error*phi
-                        weights = weights + deltaW
-                        sumerror += (1/2)*error**2
-                    error = sumerror/len(train)
-                print(error)
+    #calculate testerror
+    testerror = 0
+    for j in range(len(test)):
+        phi = phi_vector(test[j], mu, sigma_value)
+        error = error_function(test_target_1[j], phi, weights)
+        testerror += np.abs(error)
+    testerror = testerror / len(test)
+    print(testerror)
+    #    errors.append(testerror)
 
-                #calculate testerror
-                testerror = 0
-                for j in range(len(test)):
-                    phi = phi_vector(test[j], mu, sigma_value)
-                    error = error_function(test_target_1[j], phi, weights)
-                    testerror += np.abs(error)
-                testerror = testerror / len(test)
-                errors.append(testerror)
-
-            print(legend, "error:", np.mean(errors))
+    #print(legend, "error:", np.mean(errors))
 
 
 
 
     # plt.title('Convergence')
->>>>>>> 1d5421c37b01b457ef14a6268b84cee25ecf2a36
     # plt.xlabel('Epochs')
     # plt.ylabel('Error')
     # # plt.xlim((0,1500))
