@@ -131,13 +131,14 @@ def main():
 
     # Learning
     for i in range(epochs):
+        r = decay_radius(init_radius, i, time_constant)
+        l = decay_learning_rate(init_learning_rate, i, epochs)
         # for each MP
         for j in range((votes_data.shape[0])):
             row_p = votes_data[j][:]
             bmu, bmu_idx = find_bmu(row_p, net)
 
-            r = decay_radius(init_radius, i, time_constant)
-            l = decay_learning_rate(init_learning_rate, i, epochs)
+
             # now we know the BMU, update its
             # weight vector to move closer to input
             # and move its neighbours in 2-D space closer
