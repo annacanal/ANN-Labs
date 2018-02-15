@@ -156,7 +156,7 @@ def main():
     mutyp = 'cl'   #how nodes are initialized. options: "rnd" = random, "mean" = splitting in chunks and getting the means,
                     # "cl" = competitive learning, "vcl" = vanilla competitive learning
     eta = 0.001
-    sigma_value=0.4
+    sigma_value=0.3
     epochs = 1000
     nodes = 10
 
@@ -195,7 +195,8 @@ def main():
 
     #Delta rule:
     weights = weights_init(mu)
-
+    phi_vecs=[]
+    prediction=[]
     for i in range(epochs):
         sumerror = 0
         for j in range(train.shape[0]):
@@ -204,23 +205,66 @@ def main():
             deltaW = eta*np.dot(error,np.transpose(phi))
             weights = weights + deltaW
             sumerror += (1/2)*error**2
+            phi_vecs.append(phi)
+            prediction.append(np.dot( weights,phi))
         error = sumerror/len(train)
     print(error)
 
     #calculate testerror
     testerror = 0
+    phi_vecs_test=[]
+    prediction_test = []
     for j in range(len(test)):
-        phi = phi_vector(test[j], mu, sigma_value)
+        phi_test = phi_vector(test[j], mu, sigma_value)
         error = error_function(test_target[j], phi, weights)
         testerror += np.abs(error)
+        phi_vecs_test.append(phi_test)
+        prediction_test.append(np.dot( weights,phi_test))
     testerror = testerror / len(test)
     print(testerror)
     #    errors.append(testerror)
 
     #print(legend, "error:", np.mean(errors))
 
+    #train prediction
+    #prediction = np.dot(phi_vecs,weights)
+
+    prediction1=[]
+    prediction2=[]
+    prediction_test1=[]
+    prediction_test2=[]
+    train_target1=[]
+    train_target2=[]
+    test_target1=[]
+    test_target2=[]
+    for i in range(len(prediction)):
+        prediction1.append(prediction[i][0])
+        prediction2.append(prediction[i][1])
+    for i in range(len(prediction_test)):
+        prediction_test1.append(prediction_test[i][0])
+        prediction_test2.append(prediction_test[i][1])
+
+    for i in range(len(train_target)):
+        train_target1.append(train_target[i][0])
+        train_target2.append(train_target[i][1])
+    for i in range(len(test_target)):
+        test_target1.append(test_target[i][0])
+        test_target2.append(test_target[i][1])
 
 
+    name = "train approximation, CL with nodes = "+str(nodes)
+    plt.title(name)
+    plt.scatter(prediction1,prediction2,s=2.5, label="Prediction")
+    plt.scatter(train_target1,train_target2, s=2.5, label="Target")
+    plt.legend()
+    plt.show()
+    #test prediction
+    name = "test approximation, CL with nodes = " + str(nodes)
+    plt.title(name)
+    plt.scatter(prediction_test1,prediction_test2, s=2.5, label="Prediction")
+    plt.scatter(test_target1,test_target2, s=2.5, label="Target")
+    plt.legend()
+    plt.show()
 
     # plt.title('Convergence')
     # plt.xlabel('Epochs')
