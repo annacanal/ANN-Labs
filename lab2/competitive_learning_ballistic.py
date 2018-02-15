@@ -156,68 +156,78 @@ def main():
     mutyp = 'cl'   #how nodes are initialized. options: "rnd" = random, "mean" = splitting in chunks and getting the means,
                     # "cl" = competitive learning, "vcl" = vanilla competitive learning
     eta = 0.001
-    sigma_value=0.4
+    sigma_value=0.3
     epochs = 1000
     nodes = 10
 
     train, train_target, test, test_target = open_data()
 
-    #errors = []
-    #for times in range(10):
+        #errors = []
+        #for times in range(10):
 
-    if mutyp == 'rnd':
-        net = rnd_init_mus(nodes, train)
-        marker = '<'
-        legend = 'Random'
-    elif mutyp == 'mean':
-        net = init_mus(nodes, train)
-        marker = '^'
-        legend = 'Manual'
-    elif mutyp == 'cl':
-        #Competitive learning
-        net = np.random.random((nodes, train.shape[1]))
-        net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
-        marker = '>'
-        legend = 'CL'
-    elif mutyp == 'vcl':
-        #Vanilla competitive learning
-        net = vanillacl_for_mu_placement(epochs, train, np.random.random((nodes, 2))) #2*np.pi *
-        marker = 'v'
-        legend = 'Vanilla CL'
-    else:
-        print("WRONG MUTYP")
-        exit(1)
+    for nodes in [10]:
 
-    #plt.scatter(net.shape[1])
+        if mutyp == 'rnd':
+            net = rnd_init_mus(nodes, train)
+            marker = '<'
+            legend = 'Random'
+        elif mutyp == 'mean':
+            net = init_mus(nodes, train)
+            marker = '^'
+            legend = 'Manual'
+        elif mutyp == 'cl':
+            #Competitive learning
+            net = np.random.random((nodes, train.shape[1]))
+            net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
+            marker = '>'
+            legend = 'CL'
+        elif mutyp == 'vcl':
+            #Vanilla competitive learning
+            net = vanillacl_for_mu_placement(epochs, train, np.random.random((nodes, 2))) #2*np.pi *
+            marker = 'v'
+            legend = 'Vanilla CL'
+        else:
+            print("WRONG MUTYP")
+            exit(1)
 
-    # mu = net.flatten()
-    mu = net
+        a = net[:][0]
+        b = net[:][1]
+        plt.scatter(a, b)
+        plt.scatter(train[:][0], train[:][1])
+        plt.show()
+        exit(0)
 
-    #Delta rule:
-    weights = weights_init(mu)
+        # mu = net.flatten()
+        mu = net
 
-    for i in range(epochs):
-        sumerror = 0
-        for j in range(train.shape[0]):
-            phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(train_target[j], phi, weights)
-            deltaW = eta*np.dot(error,np.transpose(phi))
-            weights = weights + deltaW
-            sumerror += (1/2)*error**2
-        error = sumerror/len(train)
-    print(error)
+        #Delta rule:
+        weights = weights_init(mu)
 
-    #calculate testerror
-    testerror = 0
-    for j in range(len(test)):
-        phi = phi_vector(test[j], mu, sigma_value)
-        error = error_function(test_target[j], phi, weights)
-        testerror += np.abs(error)
-    testerror = testerror / len(test)
-    print(testerror)
-    #    errors.append(testerror)
+        for i in range(epochs):
+            sumerror = 0
+            for j in range(train.shape[0]):
+                phi = phi_vector(train[j], mu, sigma_value)
+                error = error_function(train_target[j], phi, weights)
+                deltaW = eta*np.dot(error,np.transpose(phi))
+                weights = weights + deltaW
+                sumerror += (1/2)*error**2
+            error = sumerror/len(train)
+        print('Nodes: ', nodes,'Train error: ',error)
 
-    #print(legend, "error:", np.mean(errors))
+        #calculate testerror
+        testerror = 0
+        for j in range(len(test)):
+            phi = phi_vector(test[j], mu, sigma_value)
+            error = error_function(test_target[j], phi, weights)
+            testerror += np.abs(error)
+        testerror = testerror / len(test)
+        print('Nodes: ', nodes,'Train error: ', testerror)
+
+        print('--------')
+        #    errors.append(testerror)
+
+        #print(legend, "error:", np.mean(errors))
+
 
 
 
