@@ -24,11 +24,7 @@ def open_data():
 
 
 def weights_init(x):
-<<<<<<< HEAD
-    weights = np.random.random((100, 2))
-=======
     weights = np.random.rand(x.shape[0])
->>>>>>> e1b628badefd58e60dee0643e8760dd96df4ee38
     return weights
 
 def sin_function(x):
@@ -49,19 +45,8 @@ def phi_vector(xi, mu, sigma):
     return phi_vector
 
 def error_function(target, phi_vector, weights):
-<<<<<<< HEAD
-    # errors = np.zeros((len(target[0]), len(target[1])))
-    errors = []
-    for i in range(len(target[0])): #10
-        # for j in range(len(target[1])): #2    
-        error= target[i] - phi_vector[i]*weights[i]
-        errors.append(error)
-    print(errors)
-    return errors
-=======
     error= target - np.dot(weights,phi_vector)
     return error
->>>>>>> e1b628badefd58e60dee0643e8760dd96df4ee38
 
 def find_bmu(t, net):
     """
