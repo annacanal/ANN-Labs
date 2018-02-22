@@ -6,7 +6,7 @@ def read_pictData():
     number_patterns = 11 #9 or 11 patterns of lenght = 1024
     patterns_matrix = np.zeros([number_patterns,1024])
 
-    with open("pict (1).dat", "r") as f:
+    with open("pict.dat", "r") as f:
         # Read the whole file at once
         patterns_line = f.read()
     patterns_line = patterns_line.split(",")
