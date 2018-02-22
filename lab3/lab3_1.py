@@ -36,7 +36,7 @@ def binary_bipolar(x):
 def bipolar_binary(x):
     for i in range(len(x)):
         for j in range(len(x[0])):
-            if x[i][j]==-1:
+            if x[i][j] <=  0:
                 x[i][j] = 0
             else:
                 x[i][j] = 1
@@ -65,8 +65,9 @@ def main():
     pattern_bin = binary_bipolar(pattern)
     W = weight_matrix(nodes, pattern)
     output = calc_activations(nodes, W, pattern[2])
-    output[output>0] = 1
-    output[output<=0] = 0
+    # output[output>0] = 1
+    # output[output<=0] = 0
+    output = bipolar_binary(output.reshape(1,-1))
     print(output)
     # //print(bipolar_binary(output))
 
