@@ -1,6 +1,13 @@
 import numpy as np
 
 
+def noisy_patterns():
+    x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1])
+    x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0,])
+    x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1])
+    noisypattern = np.concatenate(([x1d], [x2d], [x3d]))
+    return noisypattern
+
 def patterns():
     x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1])
     x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0])
@@ -40,20 +47,19 @@ def weight_matrix(nodes, patterns):
     return W
 
 
-def calc_activations(nodes, W, input_pattern):
-    return np.sum(W * input_pattern, axis=1)
+def calc_activations(W, input_pattern):
+    output = np.sum(W * input_pattern, axis=1)
+    output = bipolar_binary(output.reshape((-1, 1)))
+    output = output.flatten()
+    return output
 
 def main():
     nodes = 8
     pattern = patterns()
     pattern_bin = binary_bipolar(pattern)
     W = weight_matrix(nodes, pattern)
-    output = calc_activations(nodes, W, pattern[2])
-    # output[output>0] = 1
-    # output[output<=0] = 0
-    output = bipolar_binary(output.reshape(1,-1))
+    output = calc_activations(W, pattern[2])
     print(output)
-    # //print(bipolar_binary(output))
 
 
 
