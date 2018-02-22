@@ -1,21 +1,6 @@
 import numpy as np
 
 
-def read_pictData():
-    number_patterns = 11 #9 or 11 patterns of lenght = 1024
-    patterns_matrix = np.zeros([number_patterns,1024])
-
-    with open("pict.dat", "r") as f:
-        # Read the whole file at once
-        patterns_line = f.read()
-    patterns_line = patterns_line.split(",")
-    for i in range(number_patterns):
-        for j in range(1024):
-            position = j+1024*i
-            patterns_matrix[i][j] = patterns_line[position]
-
-    return patterns_matrix
-
 def noisy_patterns():
     x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1])
     x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0,])
@@ -42,7 +27,7 @@ def binary_bipolar(x):
 def bipolar_binary(x):
     for i in range(len(x)):
         for j in range(len(x[0])):
-            if x[i][j]==-1:
+            if x[i][j] <=  0:
                 x[i][j] = 0
             else:
                 x[i][j] = 1
@@ -63,7 +48,10 @@ def weight_matrix(nodes, patterns):
 
 
 def calc_activations(W, input_pattern):
-    return bipolar_binary(np.sum(W * input_pattern, axis=1))
+    output = np.sum(W * input_pattern, axis=1)
+    output = bipolar_binary(output.reshape((-1, 1)))
+    output = output.flatten()
+    return output
 
 def main():
     nodes = 8
@@ -71,9 +59,7 @@ def main():
     pattern_bin = binary_bipolar(pattern)
     W = weight_matrix(nodes, pattern)
     output = calc_activations(W, pattern[2])
-
     print(output)
-    # //print(bipolar_binary(output))
 
 
 
