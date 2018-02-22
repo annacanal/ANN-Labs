@@ -178,27 +178,6 @@ def main():
                                 sumerror_square += (1 / 2) * error_square_train ** 2
                                 sumerror_square_test += (1 / 2) * error_square_test ** 2
                             # e =  np.sqrt((np.sum(error*error))) / len(error)
-<<<<<<< HEAD
-                        errors.append(sumerror/len(train))
-                    print("type:", typ, "mus init type:", mutyp ,"sigma_value:", sigma_value, "nodes:", nodes, "error:",sumerror/len(train))
-
-
-    # prediction = np.dot(phi_vecs,weights)
-    # name = type +" approximation, delta rule"
-    # plt.title(name)
-    # plt.scatter(train, prediction,s=2.5, label="Prediction")
-    # plt.scatter(train, target, s=2.5, label="Target")
-    # plt.legend()
-    # plt.show()
-    #
-    # iterations = np.arange(epochs)
-    # name= "Error/iteration delta rule"
-    # plt.title(name)
-    # plt.plot(iterations, errors,'blue')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Error')
-    # plt.show()
-=======
 
                         if typ == 'sin':
                             errors_sin_train.append(sumerror_sin / len(train))
@@ -250,7 +229,6 @@ def main():
         plt.show()
 
 
->>>>>>> 79b469c947df0a46890c41671a39a3873ea5701f
 
 
 if __name__ == "__main__":
