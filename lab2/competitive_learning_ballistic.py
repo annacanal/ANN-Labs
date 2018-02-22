@@ -162,71 +162,6 @@ def main():
 
     train, train_target, test, test_target = open_data()
 
-<<<<<<< HEAD
-    #errors = []
-    #for times in range(10):
-
-    if mutyp == 'rnd':
-        net = rnd_init_mus(nodes, train)
-        marker = '<'
-        legend = 'Random'
-    elif mutyp == 'mean':
-        net = init_mus(nodes, train)
-        marker = '^'
-        legend = 'Manual'
-    elif mutyp == 'cl':
-        #Competitive learning
-        net = np.random.random((nodes, train.shape[1]))
-        net = cl_for_mu_placement(epochs, train, net) #2*np.pi *
-        marker = '>'
-        legend = 'CL'
-    elif mutyp == 'vcl':
-        #Vanilla competitive learning
-        net = vanillacl_for_mu_placement(epochs, train, np.random.random((nodes, 2))) #2*np.pi *
-        marker = 'v'
-        legend = 'Vanilla CL'
-    else:
-        print("WRONG MUTYP")
-        exit(1)
-
-    #plt.scatter(net.shape[1])
-
-    # mu = net.flatten()
-    mu = net                #10,2
-
-    #Delta rule:
-    weights = weights_init(mu)
-    phi_vecs=[]
-    prediction=[]
-    for i in range(epochs):
-        sumerror = 0
-        for j in range(train.shape[0]):
-            phi = phi_vector(train[j], mu, sigma_value)
-            error = error_function(train_target[j], phi, weights)
-            deltaW = eta*np.dot(error,np.transpose(phi))
-            weights = weights + deltaW
-            sumerror += (1/2)*error**2
-            phi_vecs.append(phi)
-            prediction.append(np.dot(weights,phi))
-        error = sumerror/len(train)
-    print(error)
-
-    #calculate testerror
-    testerror = 0
-    phi_vecs_test=[]
-    prediction_test = []
-    for j in range(len(test)):
-        phi_test = phi_vector(test[j], mu, sigma_value)
-        error = error_function(test_target[j], phi, weights)
-        testerror += np.abs(error)
-        phi_vecs_test.append(phi_test)
-        prediction_test.append(np.dot( weights,phi_test))
-    testerror = testerror / len(test)
-    # print(testerror)
-    #    errors.append(testerror)
-
-    #print(legend, "error:", np.mean(errors))
-=======
         #errors = []
         #for times in range(10):
 
@@ -295,7 +230,6 @@ def main():
 
         #print(legend, "error:", np.mean(errors))
 
->>>>>>> 4fb4765d67556f4eb649b96e0b97e3f8e969478a
 
     #train prediction
     #prediction = np.dot(phi_vecs,weights)
@@ -326,10 +260,6 @@ def main():
     name = "train approximation, CL with nodes = "+str(nodes)
     plt.title(name)
     plt.scatter(prediction1,prediction2,s=2.5, label="Prediction")
-<<<<<<< HEAD
-    
-=======
->>>>>>> 4fb4765d67556f4eb649b96e0b97e3f8e969478a
     plt.scatter(train_target1,train_target2, s=2.5, label="Target")
     plt.legend()
     plt.show()
