@@ -48,6 +48,7 @@ def calculate_influence(distance, radius):
 
 def main():
     cities_data_matrix = get_data_matrix()
+    print(cities_data_matrix)
     #epochs = 5
     # weight matrix (i.e. the SOM) needs to be one m-dimensional vector for each neuron in the SOM
     net = np.random.random((10, 2))
