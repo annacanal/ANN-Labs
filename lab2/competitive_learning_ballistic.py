@@ -190,10 +190,12 @@ def main():
             print("WRONG MUTYP")
             exit(1)
 
-        a = net[:][0]
-        b = net[:][1]
-        plt.scatter(a, b)
-        plt.scatter(train[:][0], train[:][1])
+        plt.title('Node placements')
+        a = net[:,0]
+        b = net[:,1]
+        plt.scatter(a, b, label = 'nodes')
+        plt.scatter(train[:,0], train[:,1], label = 'train input')
+        plt.legend(loc = 'upper left')
         plt.show()
         exit(0)
 
