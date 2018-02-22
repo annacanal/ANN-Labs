@@ -48,7 +48,7 @@ def main():
     pattern = patterns()
     pattern_bin = binary_bipolar(pattern)
     W = weight_matrix(nodes, pattern)
-    output = calc_activations(nodes, W, pattern[0])
+    output = calc_activations(nodes, W, pattern[2])
     output[output>0] = 1
     output[output<=0] = 0
     print(output)
