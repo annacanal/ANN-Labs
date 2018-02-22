@@ -6,23 +6,25 @@ def patterns():
     x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1])
     x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0])
     x3 = np.array([0, 1, 1, 0, 1, 0, 0, 1])
-    # pattern = np.concatenate(x1,x2)
-    return x1, x2, x3
+    pattern = np.concatenate(([x1], [x2], [x3]))
+    return pattern
 
 def binary_bipolar(x):
     for i in range(len(x)):
-        if x[i]==0:
-            x[i] = -1
-        else:
-            x[i] = 1
+        for j in range(len(x[0])):
+            if x[i][j]==0:
+                x[i][j] = -1
+            else:
+                x[i][j] = 1
     return x
 
 def bipolar_binary(x):
     for i in range(len(x)):
-        if x[i]==-1:
-            x[i] = 0
-        else:
-            x[i] = 1
+        for j in range(len(x[0])):
+            if x[i][j]==-1:
+                x[i][j] = 0
+            else:
+                x[i][j] = 1
     return x
 
 def weight_matrix(pattern):
@@ -31,11 +33,11 @@ def weight_matrix(pattern):
 
 
 def main():
-    x1, x2, x3 = patterns()
-    # x1_bin = binary_bipolar(x1)
-    # print(x1_bin)
-    # x1_bip = bipolar_binary(x1_bin)
-    # print(x1_bip)
+    pattern = patterns()
+    pattern_bin = binary_bipolar(pattern)
+    print(pattern_bin) 
+
+
 
 if __name__ == "__main__":
     main()
