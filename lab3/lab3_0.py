@@ -28,9 +28,11 @@ def bipolar_binary(x):
     return x
 
 def weight_matrix(pattern):
-    matrix = np.zeros(())
+    matrix = np.zeros((len(pattern),len(pattern[0])))
+    for i in range(len(pattern)):
+        for j in range(len(pattern[0])):
+            matrix[i][j] = 
     return matrix
-
 
 def main():
     pattern = patterns()
