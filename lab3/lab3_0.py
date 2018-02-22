@@ -28,15 +28,17 @@ def bipolar_binary(x):
     return x
 
 def weight_matrix(pattern):
-    matrix = np.zeros(())
-    return matrix
-
+    Nodes = len(pattern[0])
+    W2 = np.zeros((Nodes,Nodes))
+    for k in range(pattern.shape[0]):
+        W2 += (1/Nodes) * ( np.outer(np.transpose(pattern[k]), pattern[k])  )
+    return W2
 
 def main():
     pattern = patterns()
-    pattern_bin = binary_bipolar(pattern)
-    print(pattern_bin) 
-
+    pattern_bip = binary_bipolar(pattern)
+    tot = weight_matrix(pattern_bip)
+    print(tot)
 
 
 if __name__ == "__main__":
