@@ -14,3 +14,5 @@ def read_pictData():
             patterns_matrix[i][j] = patterns_line[position]
 
     return patterns_matrix
+
+    
