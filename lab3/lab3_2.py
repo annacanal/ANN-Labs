@@ -113,22 +113,32 @@ def main():
 
 ######################## Asynchronous update // Sequential update with random units ################################
 
-    iterations = 3000
-    for i in range(iterations):
+    iterations = 6000
+    for i in range(iterations+1):
         output3 = seq_update(W, patterns_matrix[9])
         output4 = seq_update(W, patterns_matrix[10])
-        if i % 200== 0:
-            # plot outputs
-            fig = plt.figure()
-            fig.suptitle("Sequential (Asynchronous) update "+str(i)+" iterations")
-            ax1 = fig.add_subplot(121)
-            ax1.imshow(pattern_transform(output3))
-            ax1.set_title("Recovered from p11")
-            ax2 = fig.add_subplot(122)
-            ax2.imshow(pattern_transform(output4))
-            ax2.set_title("Recovered from p22")
-            plt.show()
+        # if i % 100== 0:
+        #     # plot outputs
+        #     fig = plt.figure()
+        #     fig.suptitle("Sequential (Asynchronous) update "+str(i)+" iterations")
+        #     ax1 = fig.add_subplot(121)
+        #     ax1.imshow(pattern_transform(output3))
+        #     ax1.set_title("Recovered from p11")
+        #     ax2 = fig.add_subplot(122)
+        #     ax2.imshow(pattern_transform(output4))
+        #     ax2.set_title("Recovered from p22")
+        #     plt.show()
 
+     # plot outputs after all the iterations
+    fig = plt.figure()
+    fig.suptitle("Sequential (Asynchronous) update "+str(i)+" iterations")
+    ax1 = fig.add_subplot(121)
+    ax1.imshow(pattern_transform(output3))
+    ax1.set_title("Recovered from p11")
+    ax2 = fig.add_subplot(122)
+    ax2.imshow(pattern_transform(output4))
+    ax2.set_title("Recovered from p22")
+    plt.show()
 
 if __name__ == "__main__":
     main()
