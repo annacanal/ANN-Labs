@@ -1,6 +1,48 @@
 import numpy as np
 
 
+def change_bit(pattern, bit_place):
+    # change the bit
+    the_bit = pattern[bit_place]
+    if the_bit == -1:
+        the_bit = 1
+    else:
+        the_bit = -1
+
+    # replace the bit
+    new_pattern = np.copy(pattern)
+    new_pattern[bit_place] = the_bit
+
+    return new_pattern
+
+
+def make_all_noisy_patterns(patterns):
+    #the noisy patterns will be:
+    #for one (every possible) bit flipped: num_of_patterns x length_of_patterns
+    #for two (every possible) bit flipped:
+    noisy_patterns = np.zeros((np.shape(patterns)[0] * np.shape(patterns)[1], np.shape(patterns)[1]))
+    for i in range(np.shape(patterns)[0]):
+        the_original = patterns[i]
+        for j in range(np.shape(patterns)[1]):
+            the_new = change_bit(the_original, j)
+            noisy_patterns[i*np.shape(patterns)[1] + j] = the_new
+
+    #now change two bits
+    for i in range(np.shape(patterns)[0]):
+        the_original = patterns[i]
+        for j in range(np.shape(patterns)[1]):
+            for k in range(np.shape(patterns)[1]):
+                if j == k: continue
+
+                the_new = change_bit(the_original, j)
+                the_new = change_bit(the_new, k)
+                noisy_patterns = np.vstack((noisy_patterns, the_new))
+
+
+    return noisy_patterns
+
+
+
 def noisy_patterns():
     x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1])
     x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0,])
@@ -51,7 +93,6 @@ def weight_matrix(nodes, patterns):
 
 def calc_activations(W, input_pattern):
     old_output = input_pattern
-    diff = 1000
     diffnum = 0
     loopnum = 0
     while diffnum < 10 and loopnum <1000000:
@@ -76,11 +117,17 @@ def main():
     pattern_bip = binary_bipolar(pattern)
     W = weight_matrix(nodes, pattern_bip)
 
-    noisy_pattern = noisy_patterns()
-    noisy_bip = binary_bipolar(noisy_pattern)
-    output = calc_activations(W, noisy_bip[1])
-    print(output)
+    # noisy_pattern = noisy_patterns()
+    # noisy_bip = binary_bipolar(noisy_pattern)
+    # output = calc_activations(W, noisy_bip[1])
+    # print(output)
 
+    all_noisy = make_all_noisy_patterns(pattern_bip)
+    output = np.zeros(np.shape(all_noisy))
+    for i in range(all_noisy.shape[0]):
+        output[i] = calc_activations(W, all_noisy[i])
+    attractors = np.unique(output, axis=0)
+    print(bipolar_binary(attractors))
 
 
 if __name__ == "__main__":
