@@ -80,17 +80,20 @@ def energy(weights, pattern):
     return E
 
 def main():
-    pattern = read_pictData()
-    # print(pattern.shape)
-    train_pattern = pattern[0:9]
-    test_pattern = pattern[9:12]
-    # print(train_pattern.shape)
-    # print(test_pattern.shape)
+    patterns_matrix = read_pictData()
     nodes = len(pattern[0])
-    weights = weight_matrix(nodes, train_pattern)
 
     output1 = calc_activations(weights, train_pattern[0])
     output1 = calc_activations(weights, test_pattern[0])
+
+    #train with p1, p2, p3
+    train_patterns = [patterns_matrix[0], patterns_matrix[1], patterns_matrix[2]]
+    W = weight_matrix(nodes, train_patterns)
+
+    ######################### outputs
+    output = calc_activations(W, patterns_matrix[9]) #check the p11 (which is the 10)
+    output2 = calc_activations(W, patterns_matrix[10]) #check the p22 (which is the 11)
+
 
 
 if __name__ == "__main__":
