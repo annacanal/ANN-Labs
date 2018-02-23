@@ -27,12 +27,28 @@ def weight_matrix(nodes, patterns):
         W += (1 / nodes) * (np.outer(np.transpose(patterns[k]), patterns[k]))
     return W
 
-def sync_update(W, input_pattern):
-    output = np.sum(W * input_pattern, axis=1)
-    output[output >=0]=1
-    output[output <0]=-1
-    return output
 
+def sync_update(W, input_pattern):
+    old_output = input_pattern
+    diffnum = 0
+    loopnum = 0
+    while diffnum < 10 and loopnum <1000000:
+        new_output = np.sum(W * old_output, axis=1)
+        new_output[new_output >= 0] = 1
+        new_output[new_output < 0]= -1
+        diff = np.sum(abs(old_output - new_output))
+        if diff == 0:
+            diffnum += 1
+        else:
+            diffnum==0
+        old_output = new_output
+        loopnum += 1
+   # print("iterations:")
+   # print(loopnum)
+    output = new_output
+    output[output == -1] = 0
+    iterations = loopnum-10
+    return output, iterations
 
 
 def seq_update(W, input_pattern):
@@ -71,7 +87,7 @@ def main():
     ax5 = fig.add_subplot(236)
     ax5.imshow(pattern_transform(patterns_matrix[10]))
     ax5.set_title("p22 (mix of p2 and p3)")
-  #  plt.show()
+    plt.show()
 
     #train with p1, p2, p3
     train_patterns = [patterns_matrix[0], patterns_matrix[1], patterns_matrix[2]]
@@ -80,19 +96,19 @@ def main():
 ######################### OUTPUTS #####################################
 
 ######################## Synchronous update ################################
-    output = sync_update(W, patterns_matrix[9]) #check the p11 (which is the 10)
-    output2 = sync_update(W, patterns_matrix[10]) #check the p22 (which is the 11)
+    output, iterations = sync_update(W, patterns_matrix[9]) #check the p11 (which is the 10)
+    output2, iterations = sync_update(W, patterns_matrix[10]) #check the p22 (which is the 11)
 
     # plot outputs
     fig = plt.figure()
-    fig.suptitle("Synchronous update ")
+    fig.suptitle("Synchronous update")
     ax1 = fig.add_subplot(121)
     ax1.imshow(pattern_transform(output))
-    ax1.set_title("Recovered from p11")
+    ax1.set_title("Recovered from p11\n" + str(iterations)+" iterations")
     ax2 = fig.add_subplot(122)
     ax2.imshow(pattern_transform(output2))
-    ax2.set_title("Recovered from p22")
- #   plt.show()
+    ax2.set_title("Recovered from p22\n"+str(iterations) + " iterations")
+    plt.show()
 
 
 ######################## Asynchronous update // Sequential update with random units ################################
@@ -101,7 +117,7 @@ def main():
     for i in range(iterations):
         output3 = seq_update(W, patterns_matrix[9])
         output4 = seq_update(W, patterns_matrix[10])
-        if i % 100== 0:
+        if i % 200== 0:
             # plot outputs
             fig = plt.figure()
             fig.suptitle("Sequential (Asynchronous) update "+str(i)+" iterations")
@@ -113,7 +129,6 @@ def main():
             ax2.set_title("Recovered from p22")
             plt.show()
 
-######################## Asynchronous (Sequential) update with random units ################################
 
 if __name__ == "__main__":
     main()
