@@ -30,6 +30,13 @@ def read_pictData():
             patterns_matrix[i][j] = patterns_line[position]
     return patterns_matrix
 
+def generate_weights(size):
+    mu = np.zeros(size)
+    cov = np.eye(size)
+    weights = np.random.multivariate_normal(mu, cov, size)
+    #Making it symmetric:
+    # W = 0.5*(weights+weights.T)
+    return weights
 
 def binary_bipolar(x):
     for i in range(len(x)):
@@ -55,14 +62,6 @@ def weight_matrix(nodes, patterns):
         W += (1 / nodes) * (np.outer(np.transpose(patterns[k]), patterns[k]))
     return W
 
-# def calc_activations(W, input_pattern):
-#     output = []
-#     for i in range(len(input_pattern)):
-#         o = np.sum(W * input_pattern[i], axis=1)
-#         output.append(o)
-#     output = np.concatenate((output[0], output[1], output[2]))
-#     return output
-
 def calc_activations(W, input_pattern):
     old_output = input_pattern
     for i in range(5):
@@ -74,6 +73,14 @@ def calc_activations(W, input_pattern):
     output = output.flatten()
     return output
 
+def seq_update(W, input_pattern):
+    output= input_pattern
+    #Pick a random number between 1 and 1024
+    idx = np.random.randint(1, 1024)
+    output[idx] = np.sum(W[idx]*input_pattern.T)
+    output[output >= 0] = 1
+    output[output < 0] = -1
+    return output
 
 def energy(weights, pattern):
     E = -1/2*(np.matmul(np.matmul(pattern, weights),np.transpose(pattern)))
@@ -81,20 +88,41 @@ def energy(weights, pattern):
 
 def main():
     patterns_matrix = read_pictData()
-    nodes = len(pattern[0])
-
-    output1 = calc_activations(weights, train_pattern[0])
-    output1 = calc_activations(weights, test_pattern[0])
+    nodes = len(patterns_matrix[0])
 
     #train with p1, p2, p3
-    train_patterns = [patterns_matrix[0], patterns_matrix[1], patterns_matrix[2]]
-    W = weight_matrix(nodes, train_patterns)
+    train_patterns = np.concatenate(([patterns_matrix[0]], [patterns_matrix[1]], [patterns_matrix[2]]))
+    # W = weight_matrix(nodes, train_patterns)
+    W = generate_weights(nodes)
+    print(W)
 
-    ######################### outputs
-    output = calc_activations(W, patterns_matrix[9]) #check the p11 (which is the 10)
-    output2 = calc_activations(W, patterns_matrix[10]) #check the p22 (which is the 11)
+    #---------------------------------------outputs with batch
+    # output1 = calc_activations(W, patterns_matrix[0])
+    # output1 = calc_activations(W, patterns_matrix[1])
+    # output1 = calc_activations(W, patterns_matrix[2])
+    # print('and diatorted')
+    # output1 = calc_activations(W, patterns_matrix[9])
+    # output1 = calc_activations(W, patterns_matrix[10])
+    #------------------------------------ outputs with sequential
+    iterations = 7000
+    E3 = []
+    E4 = []
+    for i in range(iterations):
+        output3 = seq_update(W, patterns_matrix[9])
+        # output4 = seq_update(W, patterns_matrix[10])
+        E3.append(energy(W, output3))
+        # E4.append(energy(W, output4))
+    x = np.arange(0,iterations,1)
+    plt.title("Energy values with random weight matrix (nonsymmetrical)")
+    plt.plot(x,E3, label = 'pattern 9')
+    # plt.plot(x,E4, label = 'pattern 10')
+    plt.xlabel('Number of iterations')
+    plt.ylabel('Energy vales')
+    plt.legend()
+    plt.show()
 
-
+    
+    
 
 if __name__ == "__main__":
     main()
