@@ -54,12 +54,10 @@ def calc_activations(W, input_pattern):
     for i in range(100):
 
         new_output = np.sum(W * old_output, axis=1)
-        # new_output[new_output >= 0] = 1
-        # new_output[new_output < 0]= -1
+        new_output[new_output >= 0] = 1
+        new_output[new_output < 0]= -1
         old_output = new_output
 
-    new_output[new_output >= 0] = 1
-    new_output[new_output < 0]= -1
     # output = bipolar_binary(new_output.reshape((-1, 1)))
     # output = output.flatten()
     output = new_output
