@@ -16,8 +16,9 @@ def read_pictData():
             patterns_matrix[i][j] = patterns_line[position]
     return patterns_matrix
 
-def random_pattern(number, size):
-    pattern_list = []
+def random_pattern(number):
+    np.random.uniform(-2, 2, (number, 10))
+
     for i in range(number):
         patterns = np.random.normal(0, 0.1, size)
         pattern_list.append(patterns)
@@ -100,6 +101,9 @@ def energy(weights, pattern):
 def main():
     patterns_matrix = read_pictData()
     nodes = len(patterns_matrix[0])
+
+    new_pattern_matrix = random_pattern(3)
+    print(new_pattern_matrix)
 
     # # plot p1, p2, p3, p11 and p22
     # fig = plt.figure()
