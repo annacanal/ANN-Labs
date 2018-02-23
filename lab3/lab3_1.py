@@ -77,6 +77,13 @@ def noisy_patterns():
     noisypattern = np.concatenate(([x1d], [x2d], [x3d]))
     return noisypattern
 
+def more_noisy_patterns():
+    more_noisy1 = np.array([1, 1, 1, 1, 1, 1, 0, 0])  # 5 bits diff to learnt pattern 1
+    more_noisy2 = np.array([0, 1, 1, 1, 0, 1, 1, 0])  # 5 bits diff to learnt pattern 2
+    noisypattern = np.concatenate(([more_noisy1], [more_noisy2]))
+    return noisypattern
+
+
 def patterns():
     x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1])
     x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0])
@@ -152,14 +159,23 @@ def main():
     # print(output)
 
     #check all possible noisy patterns ubtil 4 bits
-    all_noisy = make_all_noisy_patterns(pattern_bip)
-    output = np.zeros(np.shape(all_noisy))
-    for i in range(all_noisy.shape[0]):
-        output[i] = calc_activations(W, all_noisy[i])
-    attractors = np.unique(output, axis=0)
-    print(bipolar_binary(attractors))
+    # all_noisy = make_all_noisy_patterns(pattern_bip)
+    # output = np.zeros(np.shape(all_noisy))
+    # for i in range(all_noisy.shape[0]):
+    #     output[i] = calc_activations(W, all_noisy[i])
+    # attractors = np.unique(output, axis=0)
+    # print(bipolar_binary(attractors))
 
-    
+    # check for even more noisy patterns
+    more_noisy_pattern = more_noisy_patterns()
+    noisy_bip = binary_bipolar(more_noisy_pattern)
+    output = calc_activations(W, noisy_bip[0])
+    print(output)
+    output = calc_activations(W, noisy_bip[1])
+    print(output)
+
+    print()
+
 
 
 if __name__ == "__main__":
