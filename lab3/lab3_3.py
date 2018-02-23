@@ -2,19 +2,34 @@ import numpy as np
 import lab3_1
 import matplotlib.pyplot as plt
 
-def patterns():
-    x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1])
-    x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0])
-    x3 = np.array([0, 1, 1, 0, 1, 0, 0, 1])
-    pattern = np.concatenate(([x1], [x2], [x3]))
-    return pattern
+# def patterns():
+#     x1 = np.array([0, 0, 1, 0, 1, 0, 0, 1])
+#     x2 = np.array([0, 0, 0, 0, 0, 1, 0, 0])
+#     x3 = np.array([0, 1, 1, 0, 1, 0, 0, 1])
+#     pattern = np.concatenate(([x1], [x2], [x3]))
+#     return pattern
 
-def noisy_patterns():
-    x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1])
-    x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0,])
-    x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1])
-    noisypattern = np.concatenate(([x1d], [x2d], [x3d]))
-    return noisypattern
+# def noisy_patterns():
+#     x1d = np.array([1, 0, 1, 0, 1, 0, 0, 1])
+#     x2d = np.array([1, 1, 0, 0, 0, 1, 0, 0,])
+#     x3d = np.array([1, 1, 1, 0, 1, 1, 0, 1])
+#     noisypattern = np.concatenate(([x1d], [x2d], [x3d]))
+#     return noisypattern
+
+def read_pictData():
+    number_patterns = 11 #9 or 11 patterns of lenght = 1024
+    patterns_matrix = np.zeros([number_patterns,1024])
+
+    with open("pict.dat", "r") as f:
+        # Read the whole file at once
+        patterns_line = f.read()
+    patterns_line = patterns_line.split(",")
+    for i in range(number_patterns):
+        for j in range(1024):
+            position = j+1024*i
+            patterns_matrix[i][j] = patterns_line[position]
+    return patterns_matrix
+
 
 def binary_bipolar(x):
     for i in range(len(x)):
@@ -28,7 +43,7 @@ def binary_bipolar(x):
 def bipolar_binary(x):
     for i in range(len(x)):
         for j in range(len(x[0])):
-            if x[i][j] <=  0:
+            if x[i][j] <  0:
                 x[i][j] = 0
             else:
                 x[i][j] = 1
@@ -49,8 +64,13 @@ def weight_matrix(nodes, patterns):
 #     return output
 
 def calc_activations(W, input_pattern):
-    output = np.sum(W * input_pattern, axis=1)
-    output = bipolar_binary(output.reshape((-1, 1)))
+    old_output = input_pattern
+    for i in range(5):
+        new = np.sign(np.sum(W * old_output, axis=1))
+        old_output = new
+        e = energy(W, new)
+        print(e)
+    output = bipolar_binary(new.reshape((-1, 1)))
     output = output.flatten()
     return output
 
@@ -60,37 +80,37 @@ def energy(weights, pattern):
     return E
 
 def main():
-    patterns_matrix = patterns()
-    pattern = binary_bipolar(patterns_matrix)
+    pattern = read_pictData()
+    # print(pattern.shape)
+    train_pattern = pattern[0:9]
+    test_pattern = pattern[9:12]
+    # print(train_pattern.shape)
+    # print(test_pattern.shape)
+    nodes = len(pattern[0])
+    weights = weight_matrix(nodes, train_pattern)
 
-    noisy_pattern = noisy_patterns()
-    pattern_noise = binary_bipolar(noisy_pattern)
-    
-    nodes = 8
-    weights = weight_matrix(nodes, pattern)
-
-    E = energy(weights, pattern_noise[2])
-    print(E)
+    output1 = calc_activations(weights, train_pattern[0])
+    output1 = calc_activations(weights, test_pattern[0])
 
 
 if __name__ == "__main__":
     main()
 
+    # patterns_matrix = patterns()
+    # print(patterns_matrix, 'pattern')
 
-# def read_pictData():
-#     number_patterns = 11 #9 or 11 patterns of lenght = 1024
-#     patterns_matrix = np.zeros([number_patterns,1024])
+    # pattern = binary_bipolar(patterns_matrix)
+    # noisy_pattern = noisy_patterns()
+    # print(noisy_pattern, 'noise')
+    # pattern_noise = binary_bipolar(noisy_pattern)
+    # nodes = 8
+    # weights = weight_matrix(nodes, pattern)
 
-#     with open("pict.dat", "r") as f:
-#         # Read the whole file at once
-#         patterns_line = f.read()
-#     patterns_line = patterns_line.split(",")
-#     for i in range(number_patterns):
-#         for j in range(1024):
-#             position = j+1024*i
-#             patterns_matrix[i][j] = patterns_line[position]
-#     return patterns_matrix
+    # output1 = calc_activations(weights, pattern_noise[0])
+    # output2 = calc_activations(weights, pattern_noise[1])
+    # output3 = calc_activations(weights, pattern_noise[2])
 
-# def pattern_transform(pattern):
-#     new_pattern = pattern.reshape(32,32)
-#     return new_pattern
+    # print(output1, 'output_1')
+    # print(output2, 'output_2')
+    # print(output3, 'output_3')
+
