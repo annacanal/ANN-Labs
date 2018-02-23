@@ -82,16 +82,16 @@ def main():
     # plot p1, p2, p3
     fig = plt.figure()
     # p1
-    ax1 = fig.add_subplot(231)
+    ax1 = fig.add_subplot(131)
     ax1.imshow(pattern_transform(patterns_matrix[0]))
     #ax1.title("p1")
     ax1.set_title("p1")
     # p2
-    ax2 = fig.add_subplot(232)
+    ax2 = fig.add_subplot(132)
     ax2.imshow(pattern_transform(patterns_matrix[1]))
     ax2.set_title("p2")
     # p3
-    ax3 = fig.add_subplot(233)
+    ax3 = fig.add_subplot(133)
     ax3.imshow(pattern_transform(patterns_matrix[2]))
     ax3.set_title("p3")
 
@@ -101,29 +101,34 @@ def main():
     W = weight_matrix(nodes, train_patterns)
 
 
-    #make noise
-    percentage = 10
-    noisy1 = make_noise(train_patterns[0], 5)
-    noisy2 = make_noise(train_patterns[1], 5)
+    for percentage in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]:
+
+        #make noise
+        noisy1 = make_noise(train_patterns[0], percentage)
+        noisy2 = make_noise(train_patterns[1], percentage)
+        noisy3 = make_noise(train_patterns[2], percentage)
+
+        ##################### Synchronous update ################################
+        output1, iterations = sync_update(W, noisy1)
+        output2, iterations = sync_update(W, noisy2)
+        output3, iterations = sync_update(W, noisy3)
 
 
+        ######################### OUTPUTS #####################################
 
-    ##################### Synchronous update ################################
-    # output, iterations = sync_update(W, patterns_matrix[9]) #check the p11 (which is the 10)
-    # output2, iterations = sync_update(W, patterns_matrix[10]) #check the p22 (which is the 11)
-    #
-    # ######################### OUTPUTS #####################################
-    #
-    # # plot outputs
-    # fig = plt.figure()
-    # fig.suptitle("Synchronous update")
-    # ax1 = fig.add_subplot(121)
-    # ax1.imshow(pattern_transform(output))
-    # ax1.set_title("Recovered from p1\n" + str(iterations)+" iterations")
-    # ax2 = fig.add_subplot(122)
-    # ax2.imshow(pattern_transform(output2))
-    # ax2.set_title("Recovered from p2\n"+str(iterations) + " iterations")
-    # plt.show()
+        # plot outputs
+        fig = plt.figure()
+        fig.suptitle("Synchronous update")
+        ax1 = fig.add_subplot(131)
+        ax1.imshow(pattern_transform(output1))
+        ax1.set_title("Recovered from p1\n with" + str(percentage) + "% noise")
+        ax2 = fig.add_subplot(132)
+        ax2.imshow(pattern_transform(output2))
+        ax2.set_title("Recovered from p2\n with" + str(percentage) + "% noise")
+        ax3 = fig.add_subplot(133)
+        ax3.imshow(pattern_transform(output3))
+        ax3.set_title("Recovered from p3\n with" + str(percentage) + "% noise")
+        plt.show()
 
 
 
