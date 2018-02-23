@@ -51,15 +51,21 @@ def weight_matrix(nodes, patterns):
 
 def calc_activations(W, input_pattern):
     old_output = input_pattern
-    for i in range(100):
+    diff = 1000
+    diffnum = 0
+    loopnum = 0
+    while diffnum < 10 and loopnum <1000000:
 
         new_output = np.sum(W * old_output, axis=1)
         new_output[new_output >= 0] = 1
         new_output[new_output < 0]= -1
+        diff = np.sum(abs(old_output - new_output))
+        if diff == 0:
+            diffnum += 1
         old_output = new_output
+        loopnum += 1
 
-    # output = bipolar_binary(new_output.reshape((-1, 1)))
-    # output = output.flatten()
+    print(loopnum)
     output = new_output
     output[output == -1] = 0
     return output
@@ -72,20 +78,8 @@ def main():
 
     noisy_pattern = noisy_patterns()
     noisy_bip = binary_bipolar(noisy_pattern)
-    output = calc_activations(W, pattern_bip[0])
-    # print("output:", output, "pattern:", pattern[0], "input:", pattern[0])
-    # output = calc_activations(W, pattern_bip[1])
-    # print("output:", output, "pattern:", pattern[1], "input:", pattern[1])
-    # output = calc_activations(W, pattern_bip[2])
-    # print("output:", output, "pattern:", pattern[2], "input:", pattern[2])
-    #
-    # output = calc_activations(W, noisy_bip[0])
-    # print("output:", output, "pattern:", pattern[0], "input:", noisy_pattern[0])
     output = calc_activations(W, noisy_bip[1])
     print(output)
-    # print("output:",output, "pattern:", pattern[1], "input:", noisy_pattern[1])
-    # output = calc_activations(W, noisy_bip[2])
-    # print("output:", output, "pattern:", pattern[2], "input:", noisy_pattern[2])
 
 
 
