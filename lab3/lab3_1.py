@@ -16,22 +16,24 @@ def patterns():
     return pattern
 
 def binary_bipolar(x):
+    y = np.zeros(np.shape(x))
     for i in range(len(x)):
         for j in range(len(x[0])):
             if x[i][j]==0:
-                x[i][j] = -1
+                y[i][j] = -1
             else:
-                x[i][j] = 1
-    return x
+                y[i][j] = 1
+    return y
 
 def bipolar_binary(x):
+    y = np.zeros(np.shape(x))
     for i in range(len(x)):
         for j in range(len(x[0])):
             if x[i][j] <=  0:
-                x[i][j] = 0
+                y[i][j] = 0
             else:
-                x[i][j] = 1
-    return x
+                y[i][j] = 1
+    return y
 
 def weight_matrix(nodes, patterns):
     # # way 1
@@ -48,18 +50,44 @@ def weight_matrix(nodes, patterns):
 
 
 def calc_activations(W, input_pattern):
-    output = np.sum(W * input_pattern, axis=1)
-    output = bipolar_binary(output.reshape((-1, 1)))
-    output = output.flatten()
+    old_output = input_pattern
+    for i in range(100):
+
+        new_output = np.sum(W * old_output, axis=1)
+        # new_output[new_output >= 0] = 1
+        # new_output[new_output < 0]= -1
+        old_output = new_output
+
+    new_output[new_output >= 0] = 1
+    new_output[new_output < 0]= -1
+    # output = bipolar_binary(new_output.reshape((-1, 1)))
+    # output = output.flatten()
+    output = new_output
+    output[output == -1] = 0
     return output
 
 def main():
     nodes = 8
     pattern = patterns()
-    pattern_bin = binary_bipolar(pattern)
-    W = weight_matrix(nodes, pattern)
-    output = calc_activations(W, pattern[2])
+    pattern_bip = binary_bipolar(pattern)
+    W = weight_matrix(nodes, pattern_bip)
+
+    noisy_pattern = noisy_patterns()
+    noisy_bip = binary_bipolar(noisy_pattern)
+    output = calc_activations(W, pattern_bip[0])
+    # print("output:", output, "pattern:", pattern[0], "input:", pattern[0])
+    # output = calc_activations(W, pattern_bip[1])
+    # print("output:", output, "pattern:", pattern[1], "input:", pattern[1])
+    # output = calc_activations(W, pattern_bip[2])
+    # print("output:", output, "pattern:", pattern[2], "input:", pattern[2])
+    #
+    # output = calc_activations(W, noisy_bip[0])
+    # print("output:", output, "pattern:", pattern[0], "input:", noisy_pattern[0])
+    output = calc_activations(W, noisy_bip[1])
     print(output)
+    # print("output:",output, "pattern:", pattern[1], "input:", noisy_pattern[1])
+    # output = calc_activations(W, noisy_bip[2])
+    # print("output:", output, "pattern:", pattern[2], "input:", noisy_pattern[2])
 
 
 
