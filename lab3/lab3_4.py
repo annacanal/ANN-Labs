@@ -94,6 +94,8 @@ def main():
     ax3 = fig.add_subplot(133)
     ax3.imshow(pattern_transform(patterns_matrix[2]))
     ax3.set_title("p3")
+    plt.savefig('original_patterns.png')
+    plt.clf()
 
 
     #train with p1, p2, p3
@@ -118,19 +120,29 @@ def main():
 
         # plot outputs
         fig = plt.figure()
-        fig.suptitle("Synchronous update")
-        ax1 = fig.add_subplot(131)
-        ax1.imshow(pattern_transform(output1))
-        ax1.set_title("Recovered from p1\n with" + str(percentage) + "% noise")
-        ax2 = fig.add_subplot(132)
-        ax2.imshow(pattern_transform(output2))
-        ax2.set_title("Recovered from p2\n with" + str(percentage) + "% noise")
-        ax3 = fig.add_subplot(133)
-        ax3.imshow(pattern_transform(output3))
-        ax3.set_title("Recovered from p3\n with" + str(percentage) + "% noise")
-        plt.show()
-
-
+        title = str(percentage) + "% noise"
+        fig.suptitle(title)
+        ax1 = fig.add_subplot(231)
+        ax1.imshow(pattern_transform(noisy1))
+        ax1.set_title("Pattern p1")
+        ax2 = fig.add_subplot(232)
+        ax2.imshow(pattern_transform(noisy2))
+        ax2.set_title("Pattern p2")
+        ax3 = fig.add_subplot(233)
+        ax3.imshow(pattern_transform(noisy3))
+        ax3.set_title("Pattern p3")
+        ax4 = fig.add_subplot(234)
+        ax4.imshow(pattern_transform(output1))
+        ax4.set_title("Recovered from p1")
+        ax5 = fig.add_subplot(235)
+        ax5.imshow(pattern_transform(output2))
+        ax5.set_title("Recovered from p2")
+        ax6 = fig.add_subplot(236)
+        ax6.imshow(pattern_transform(output3))
+        ax6.set_title("Recovered from p3")
+        # plt.show()
+        plt.savefig(title +'.png')
+        plt.clf()
 
 
 if __name__ == "__main__":
