@@ -31,15 +31,31 @@ def main():
 
     Max_bias_val = 15  #Max bias value that will be use
    # step_val = 3 #Step between bias values during the experimentation
+    rhos=[]
     for mu in range(all_patterns.shape[0]):
         for i in range(all_patterns.shape[1]):
-             rho = all_patterns[mu][i]*(1 / (N*P))  # Average activity: average value of the cells in all patterns
+             rhos.append(all_patterns[mu][i]*(1 / (N*P)))  # Average activity: average value of the cells in all patterns
+    rho= np.sum(rhos,axis=0 )
 
-    #train patterns
-    W = weight_matrix(N, all_patterns,rho)
     for bias in range(Max_bias_val):
-        output = update(W, all_patterns[1], bias)
-
+        capacity_percentage = []
+        for p in range(all_patterns.shape[0]):
+            patterns = all_patterns[p]
+            #train
+            W = weight_matrix(N, patterns, rho)
+            saved = 0  # Number of saved patterns
+            original_pat = patterns.T
+            for i in range(N):
+                output = update(W, original_pat, bias)
+                diff = np.sum(abs(original_pat - output))
+                if diff == 0:
+                    saved = saved + 1
+            capacity_percentage.append(saved*100/(p+1))
+        plt.title("Patterns with 10% activity, capacity/patterns with bias= " + str(bias))
+        plt.plot(np.arange(p+1),capacity_percentage)
+        plt.xlabel('Number of patterns')
+        plt.ylabel('Capacity percentage')
+        plt.show()
 
 if __name__ == "__main__":
     main()
