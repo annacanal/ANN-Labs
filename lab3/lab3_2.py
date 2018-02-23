@@ -22,18 +22,10 @@ def pattern_transform(pattern):
 
 
 def weight_matrix(nodes, patterns):
-    # # way 1
-    # W1 = np.zeros((Nodes, Nodes))
-    # for i in range(W1.shape[0]):
-    #     for j in range(W1.shape[1]):
-    #         for k in range(patterns.shape[0]):
-    #             W1[i][j] += (1 / Nodes) * patterns[k][i] * patterns[k][j]
-
     W = np.zeros((nodes, nodes))
     for k in range(len(patterns)):
         W += (1 / nodes) * (np.outer(np.transpose(patterns[k]), patterns[k]))
     return W
-
 
 def calc_activations(W, input_pattern):
     output = np.sum(W * input_pattern, axis=1)
@@ -46,45 +38,57 @@ def main():
     patterns_matrix = read_pictData()
     nodes=1024
 
+######################## Synchronous update ################################
+    # plot p1, p2, p3, p11 and p22
+    fig = plt.figure()
+    # p1
+    ax1 = fig.add_subplot(231)
+    ax1.imshow(pattern_transform(patterns_matrix[0]))
+    #ax1.title("p1")
+    ax1.set_title("p1")
+    # p2
+    ax2 = fig.add_subplot(232)
+    ax2.imshow(pattern_transform(patterns_matrix[1]))
+    ax2.set_title("p2")
+    # p3
+    ax3 = fig.add_subplot(233)
+    ax3.imshow(pattern_transform(patterns_matrix[2]))
+    ax3.set_title("p3")
+    # p11 and p22
+    ax4 = fig.add_subplot(234)
+    ax4.imshow(pattern_transform(patterns_matrix[9]))
+    ax4.set_title("p11 (degraded version of p1)")
+    # p11 and p22
+    ax5 = fig.add_subplot(236)
+    ax5.imshow(pattern_transform(patterns_matrix[10]))
+    ax5.set_title("p22 (mix of p2 and p3)")
+    plt.show()
+
     #train with p1, p2, p3
     train_patterns = [patterns_matrix[0], patterns_matrix[1], patterns_matrix[2]]
     W = weight_matrix(nodes, train_patterns)
-    #plot p1, p2, p3
-    p1_im = pattern_transform(patterns_matrix[0])
-    plt.imshow(p1_im)
-    plt.show()
-    p2_im = pattern_transform(patterns_matrix[1])
-    plt.imshow(p2_im)
-    plt.show()
-    p3_im = pattern_transform(patterns_matrix[2])
-    plt.imshow(p3_im)
-    plt.show()
-    p9_im = pattern_transform(patterns_matrix[9])
-    plt.imshow(p9_im)
-    plt.show()
-    p10_im = pattern_transform(patterns_matrix[10])
-    plt.imshow(p10_im)
-    plt.show()
 
-    ### p11 and p22
-    print("p11")
-    print()
-    print( patterns_matrix[9])
-    print("p22")
-    print(patterns_matrix[10])
-    print()
-
-
-############################# outputs
+    ######################### outputs
     output = calc_activations(W, patterns_matrix[9]) #check the p11 (which is the 10)
     output2 = calc_activations(W, patterns_matrix[10]) #check the p22 (which is the 11)
 
-    output1_im = pattern_transform(output)
-    plt.imshow(output1_im)
+    # plot outputs
+    fig = plt.figure()
+    ax1 = fig.add_subplot(121)
+    ax1.imshow(pattern_transform(output))
+    ax1.set_title("Recovered from p11")
+    ax2 = fig.add_subplot(122)
+    ax2.imshow(pattern_transform(output2))
+    ax2.set_title("Recovered from p22")
     plt.show()
-    output2_im = pattern_transform(output2)
-    plt.imshow(output2_im)
-    plt.show()
+    
+
+
+######################## Asynchronous update ################################
+
+
+######################## Asynchronous update with random units ################################
 
 if __name__ == "__main__":
     main()
+
