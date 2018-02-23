@@ -69,7 +69,7 @@ def main():
     nodes = 8
     weights = weight_matrix(nodes, pattern)
 
-    E = energy(weights, pattern_noise[0])
+    E = energy(weights, pattern_noise[2])
     print(E)
 
 
