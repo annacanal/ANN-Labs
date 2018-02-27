@@ -16,13 +16,14 @@ def read_pictData():
             patterns_matrix[i][j] = patterns_line[position]
     return patterns_matrix
 
-def random_pattern(number):
-    np.random.uniform(-2, 2, (number, 10))
-
-    for i in range(number):
-        patterns = np.random.normal(0, 0.1, size)
-        pattern_list.append(patterns)
-    return pattern_list
+def random_pattern(row, column):
+    y = np.random.uniform(-2, 2, (row, column))
+    yy = np.sign(y)
+    return yy
+    # for i in range(number):
+    #     patterns = np.random.normal(0, 0.1, size)
+    #     pattern_list.append(patterns)
+    # return pattern_list
 
 def pattern_transform(pattern):
     new_pattern = pattern.reshape(32,32)
@@ -99,49 +100,28 @@ def energy(weights, pattern):
     return E
 
 def main():
-    patterns_matrix = read_pictData()
-    nodes = len(patterns_matrix[0])
+    test_random = np.random.uniform(-2, 2, (1, 1024))
+    test = np.sign(test_random)
+    for i in range(10):
+        train_patterns = random_pattern(i, 1024)
+        nodes = 1024
+        W = weight_matrix(nodes, train_patterns)
+        
+        output = calc_activations(W, test)
+        E = energy(W, output)
+        print(E)
 
-    new_pattern_matrix = random_pattern(3)
-    print(new_pattern_matrix)
-
-    # # plot p1, p2, p3, p11 and p22
-    # fig = plt.figure()
-    # # p1
-    # ax1 = fig.add_subplot(231)
-    # ax1.imshow(pattern_transform(patterns_matrix[0]))
-    # #ax1.title("p1")
-    # ax1.set_title("p1")
-    # # p2
-    # ax2 = fig.add_subplot(232)
-    # ax2.imshow(pattern_transform(patterns_matrix[1]))
-    # ax2.set_title("p2")
-    # # p3
-    # ax3 = fig.add_subplot(233)
-    # ax3.imshow(pattern_transform(patterns_matrix[2]))
-    # ax3.set_title("p3")
-    # # p4
-    # ax6 = fig.add_subplot(234)
-    # ax6.imshow(pattern_transform(patterns_matrix[3]))
-    # ax6.set_title("p4")
-    # # p11 and p22
-    # ax4 = fig.add_subplot(235)
-    # ax4.imshow(pattern_transform(patterns_matrix[9]))
-    # ax4.set_title("p11 (degraded version of p1)")
-    # # p11 and p22
-    # ax5 = fig.add_subplot(236)
-    # ax5.imshow(pattern_transform(patterns_matrix[10]))
-    # ax5.set_title("p22 (mix of p2 and p3)")
-    # plt.show()
-    # #--------------------------------
+    #---------------------------------
+    # patterns_matrix = read_pictData()
+    # nodes = len(patterns_matrix[0])
 
     #train with p1, p2, p3 and p4
-    train_patterns = np.concatenate(([patterns_matrix[0]],))
-    W = weight_matrix(nodes, train_patterns)
+    # train_patterns = np.concatenate(([patterns_matrix[0]],))
+    # W = weight_matrix(nodes, train_patterns)
 
-    output = calc_activations(W,  patterns_matrix[9]) #check the p11 (which is the 10)
-    E = energy(W, output)
-    print(E)
+    # output = calc_activations(W,  patterns_matrix[9]) #check the p11 (which is the 10)
+    # E = energy(W, output)
+    # print(E)
     # fig = plt.figure()
     # fig.suptitle("Synchronous update")
     # ax1 = fig.add_subplot(121)
