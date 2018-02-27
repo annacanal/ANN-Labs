@@ -127,6 +127,12 @@ def main():
     for i in range(noisy_patterns.shape[0]):
         output, iterations = sync_update(W,  noisy_patterns[i])
 
+        print(np.sum(abs(output - train_patterns[i])))
+        if np.sum(abs(output - train_patterns[i])) <150 :
+            print(i, ": Correct")
+        else:
+            print(i, ": False")
+
         fig = plt.figure()
         # fig.suptitle("Synchronous update")
         ax1 = fig.add_subplot(121)
