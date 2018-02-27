@@ -71,24 +71,14 @@ def weight_matrix_zeroDiag(nodes, patterns):
     return W
 
 
-def calc_activations(W, input_pattern,idx):
-    old_output = input_pattern
-    for i in range(5):
-        new = np.sign(W[idx] * old_output.T)
-        old_output = new
-        e = energy(W, new)
-  #  output = bipolar_binary(new.reshape((-1, 1)))
-   # output = output.flatten()
-    output = new
-    return output
-
 def update(W, input_pattern,idx):
-    output = input_pattern
-    output[idx] = np.sum(W[idx] * input_pattern.T)
+    #output = input_pattern
+    output = np.sum(W * input_pattern.T)
     output[output>= 0] = 1
     output[output < 0] = -1
     new_output = output
     return new_output
+
 
 
 
@@ -97,6 +87,7 @@ def sync_update(W, input_pattern):
     diffnum = 0
     loopnum = 0
     while diffnum < 10 and loopnum < 1000000:
+    #for i in range(5):
         new_output = np.sum(W * old_output, axis=1)
         new_output[new_output >= 0] = 1
         new_output[new_output < 0] = -1
@@ -110,8 +101,7 @@ def sync_update(W, input_pattern):
     # print("iterations:")
     # print(loopnum)
     output = new_output
-    output[output == -1] = 0
-    iterations = loopnum - 10
+    iterations = 1#loopnum - 10
     return output, iterations
 
 
@@ -145,47 +135,59 @@ def main():
     # ---------------------------------
     patterns_matrix = read_pictData()
     nodes = len(patterns_matrix[0])
-
+    P,N = patterns_matrix.shape
+    all_patterns = patterns_matrix
     # train with p1, p2, p3 and p4
     train_patterns = np.concatenate(([patterns_matrix[0]], [patterns_matrix[1]]))
     # print(train_patterns)
     output=[]
-    E=[]
     capacity_percentage=[]
+
     fig = plt.figure()
     fig.suptitle("Synchronous update")
-    saved=0
-    for i in range(4):
-        pos = 2 + i
-        pat = patterns_matrix[pos]  # .reshape(1,1024)
-        new_train_patterns = np.vstack((train_patterns, pat))
-        W = weight_matrix(nodes, new_train_patterns)
-        W1 = weight_matrix_zeroDiag(nodes, new_train_patterns)
-        for j in range(patterns_matrix.shape[1]):
-            output =update(W,  patterns_matrix[9], j) #check the p10
-        #output,it = sync_update(W,  patterns_matrix[9])
-        diff = np.sum(abs(patterns_matrix[9] - output))
-        if diff ==0:
-            saved = saved + 1
-        capacity_percentage.append(saved * 100 / (pos + 1))
-        E.append(energy(W, output))
-        #Plot
-        n = "14"+str(i+1)
-        ax = fig.add_subplot(n)
-        ax.imshow(pattern_transform(output))
-        ax.set_title(str(pos+1)+ " patterns")
-        train_patterns= new_train_patterns
-        plt.show()
-    plt.show()
-    plt.title("Energy/patterns trained")
-    plt.plot( np.arange(3,7),E)
-    plt.show()
+    E=[]
+    for i in range(9):
+        patterns = all_patterns[0:i]
+        W = weight_matrix(nodes, patterns)
+        saved = 0
+        output2=0
+        for j in range(i):
+            output2,it = sync_update(W,  patterns[j])  # check the p10
+          #  output = update(W, patterns[j])  # check the p10
+            diff = np.sum(abs(output2 - patterns[j]))
+            if diff == 0:
+                saved = saved + 1
+        capacity_percentage.append(saved * 100 / (i+1))
     plt.title("Capacity/patterns trained")
-    plt.plot( np.arange(3,7),capacity_percentage)
+    plt.plot(np.arange(0,9), capacity_percentage)
     plt.show()
-    performance = []
-    train = []
 
+    # for i in range(4):
+    #     pos = 2 + i
+    #     saved=0
+    #     pat = patterns_matrix[pos]  # .reshape(1,1024)
+    #     new_train_patterns = np.vstack((train_patterns, pat))
+    #     W = weight_matrix(nodes, new_train_patterns)
+    #     W1 = weight_matrix_zeroDiag(nodes, new_train_patterns)
+    #     for j in range(new_train_patterns.shape[1]):
+    #         output = sync_update(W, patterns_matrix[9])  # check the p10
+    #      #output,it = sync_update(W,  patterns_matrix[9])
+    #         diff = np.sum(abs(patterns_matrix[9] - output))
+    #         if diff == 0:
+    #             saved = saved + 1
+    #     capacity_percentage.append(saved * 100 / (pos + 1))
+    #     E.append(energy(W, output))
+    #     # Plot
+    #     n = "14" + str(i + 1)
+    #     ax = fig.add_subplot(n)
+    #     ax.imshow(pattern_transform(output))
+    #     ax.set_title(str(pos + 1) + " patterns")
+    #     train_patterns = new_train_patterns
+    #     plt.show()
+    # plt.show()
+    # plt.title("Energy/patterns trained")
+    # plt.plot(np.arange(3, 7), E)
+    # plt.show()
 
 
     # for i in range(9):
