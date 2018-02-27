@@ -100,45 +100,75 @@ def energy(weights, pattern):
     return E
 
 def main():
-    test_random = np.random.uniform(-2, 2, (1, 1024))
-    test = np.sign(test_random)
-    for i in range(10):
+    for i in range(1,200, 10):
         train_patterns = random_pattern(i, 1024)
+
+        # train_patterns = np.ones((i, 1024))
+        # for k in range(256, 768):
+        #    train_patterns[0][k] = -1
+        # train_patterns[1] = -1 * train_patterns[0]
+
         nodes = 1024
         W = weight_matrix(nodes, train_patterns)
-        
-        output = calc_activations(W, test)
-        E = energy(W, output)
-        print(E)
+
+        energies = np.zeros(np.shape(train_patterns)[0])
+        for j,ptrn in enumerate(train_patterns):
+            energies[j] = energy(W, ptrn)
+
+        diff = 0
+        for j, ptrn in enumerate(train_patterns):
+            output, it = sync_update(W, ptrn)
+            Eout = energy(W, output)
+
+            mindiff = 100000
+            for k,Ein in enumerate(energies):
+                # print(Ein, Eout, np.abs(Eout-Ein))
+                if mindiff > np.abs(Eout - Ein):
+                    mindiff = np.abs(Eout - Ein)
+
+        print(mindiff)
+
+
+            # # print(Eout)
+            # # diff += mindiff
+            #
+            # if np.sum(abs(output - ptrn)) < 150:
+            #     print(j, ": Correct")
+            # else:
+            #     print(j, ": False")
+
+        print("===========")
+
+        # print("Mean min diff=", diff/np.shape(train_patterns)[0])
 
     #---------------------------------
     # patterns_matrix = read_pictData()
     # nodes = len(patterns_matrix[0])
-
-    #train with p1, p2, p3 and p4
+    #
+    # #train with p1, p2, p3 and p4
     # train_patterns = np.concatenate(([patterns_matrix[0]],))
     # W = weight_matrix(nodes, train_patterns)
-
+    #
     # output = calc_activations(W,  patterns_matrix[9]) #check the p11 (which is the 10)
     # E = energy(W, output)
     # print(E)
-    # fig = plt.figure()
-    # fig.suptitle("Synchronous update")
-    # ax1 = fig.add_subplot(121)
-    # ax1.imshow(pattern_transform(output))
-    # ax1.set_title("Recovered from p11\n" + str(iterations)+" iterations")
-    # plt.show()
-
-
+    # # fig = plt.figure()
+    # # fig.suptitle("Synchronous update")
+    # # ax1 = fig.add_subplot(121)
+    # # ax1.imshow(pattern_transform(output))
+    # # ax1.set_title("Recovered from p11\n" + str(iterations)+" iterations")
+    # # plt.show()
+    # #
+    #
     # performance = []
     # train = []
-    
+    #
     # for i in range(9):
     #     train_data = train.append(patterns_matrix[i])
-    #     W = weight_matrix(nodes, train_data)
-    #     output = calc_activations(W,  patterns_matrix[9])
-    #     E = energy(W,output)
-    #     performance.append(E)
+    # W = weight_matrix(nodes, train_data)
+    # output = calc_activations(W,  patterns_matrix[9])
+    # E = energy(W,output)
+    # performance.append(E)
     # print(performance)
     
     

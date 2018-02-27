@@ -114,7 +114,8 @@ def main():
     nodes = len(patterns_matrix[0])
 
     #train with p1, p2, p3 and p4
-    train_patterns = np.concatenate(([patterns_matrix[0]],[patterns_matrix[1]],[patterns_matrix[2]],[patterns_matrix[3]]))
+    train_patterns = np.concatenate(([patterns_matrix[0]],[patterns_matrix[1]],[patterns_matrix[2]],[patterns_matrix[3]],\
+                                     [patterns_matrix[4]], [patterns_matrix[5]], [patterns_matrix[6]]))
     W = weight_matrix(nodes, train_patterns)
 
     #make the noisy patterns with 20% of noise
