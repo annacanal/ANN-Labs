@@ -85,8 +85,8 @@ def sync_update(W, input_pattern):
     old_output = input_pattern
     diffnum = 0
     loopnum = 0
-    while diffnum < 10 and loopnum < 1000000:
-    #for i in range(5):
+    # while diffnum < 10 and loopnum < 1000000:
+    for i in range(1000):
         new_output = np.sum(W * old_output, axis=1)
         new_output[new_output >= 0] = 1
         new_output[new_output < 0] = -1
@@ -181,8 +181,9 @@ def main():
     # fig.suptitle("Synchronous update")
     capacity_percentage=[]
     for i in range(train_patterns.shape[0]):
+        print(i/3)
         patterns = train_patterns[0:i+1]
-        W = weight_matrix(nodes, patterns)
+        W = weight_matrix_zeroDiag(nodes, patterns)
         saved = 0
         output2 = 0
         for j in range(i+1):
@@ -192,7 +193,7 @@ def main():
             if diff == 0:
                 saved = saved + 1
         capacity_percentage.append(saved * 100 / (i + 1))
-    plt.title("Capacity/patterns trained, with 50 % noise")
+    plt.title("Capacity/patterns trained")
     plt.xlabel('Number of patterns')
     plt.ylabel('Capacity in percentage')
     plt.plot(np.arange(0, train_patterns.shape[0]), capacity_percentage)
