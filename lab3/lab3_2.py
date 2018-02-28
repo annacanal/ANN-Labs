@@ -43,10 +43,7 @@ def sync_update(W, input_pattern):
             diffnum==0
         old_output = new_output
         loopnum += 1
-   # print("iterations:")
-   # print(loopnum)
     output = new_output
-    output[output == -1] = 0
     iterations = loopnum-10
     return output, iterations
 
