@@ -105,48 +105,58 @@ def energy(weights, pattern):
     return E
 
 def main():
-    # Jenny:
-    # np.random.seed(10)
-    # test_random = np.random.uniform(-2, 2, (1, 1024))
-    # test = np.sign(test_random)
-    # train_patterns = np.vstack((test, random_pattern(1, 1024)))
-    
-    # for i in range(100):
+    np.random.seed(10)
+    train_patterns = np.vstack((random_pattern(1,1024), random_pattern(1, 1024)))
+    output=[]
+    capacity_percentage=[]
+
+    fig = plt.figure()
+    fig.suptitle("Synchronous update") 
+    saved = 0
+    for i in range(10):
+        nodes = len(train_patterns[0])
+        W = weight_matrix(nodes, train_patterns)
+        for j in range(i+1):
+            output, it = sync_update(W, train_patterns[j])
+            diff = np.sum(abs(output - train_patterns[j]))
+            if diff == 0:
+                saved = saved + 1
+        capacity_percentage.append(saved * 100 / (i+1))
+        train_patterns = np.vstack((train_patterns, random_pattern(1, 1024)))
+    plt.title("Capacity/patterns trained_random")
+    plt.plot(np.arange(0,9), capacity_percentage)
+    plt.show()
+
+
+
+       #-------------------------------Someone else's------------------ 
+    # for i in range(1,200, 10):
+    #     train_patterns = random_pattern(i, 1024)
+
+    #     # train_patterns = np.ones((i, 1024))
+    #     # for k in range(256, 768):
+    #     #    train_patterns[0][k] = -1
+    #     # train_patterns[1] = -1 * train_patterns[0]
+
     #     nodes = 1024
     #     W = weight_matrix(nodes, train_patterns)
-        
-    #     output = sync_update(W, test)
-    #     E = energy(W, output)
-    #     print(E)
-    #     train_patterns = np.vstack((train_patterns, random_pattern(1, 1024)))
-        
-    for i in range(1,200, 10):
-        train_patterns = random_pattern(i, 1024)
 
-        # train_patterns = np.ones((i, 1024))
-        # for k in range(256, 768):
-        #    train_patterns[0][k] = -1
-        # train_patterns[1] = -1 * train_patterns[0]
+    #     energies = np.zeros(np.shape(train_patterns)[0])
+    #     for j,ptrn in enumerate(train_patterns):
+    #         energies[j] = energy(W, ptrn)
 
-        nodes = 1024
-        W = weight_matrix(nodes, train_patterns)
+    #     diff = 0
+    #     for j, ptrn in enumerate(train_patterns):
+    #         output, it = sync_update(W, ptrn)
+    #         Eout = energy(W, output)
 
-        energies = np.zeros(np.shape(train_patterns)[0])
-        for j,ptrn in enumerate(train_patterns):
-            energies[j] = energy(W, ptrn)
+    #         mindiff = 100000
+    #         for k,Ein in enumerate(energies):
+    #             # print(Ein, Eout, np.abs(Eout-Ein))
+    #             if mindiff > np.abs(Eout - Ein):
+    #                 mindiff = np.abs(Eout - Ein)
 
-        diff = 0
-        for j, ptrn in enumerate(train_patterns):
-            output, it = sync_update(W, ptrn)
-            Eout = energy(W, output)
-
-            mindiff = 100000
-            for k,Ein in enumerate(energies):
-                # print(Ein, Eout, np.abs(Eout-Ein))
-                if mindiff > np.abs(Eout - Ein):
-                    mindiff = np.abs(Eout - Ein)
-
-        print(mindiff)
+    #     print(mindiff)
 
 
             # # print(Eout)
@@ -157,11 +167,11 @@ def main():
             # else:
             #     print(j, ": False")
 
-        print("===========")
+        # print("===========")
 
         # print("Mean min diff=", diff/np.shape(train_patterns)[0])
 
-    #---------------------------------
+    #--------------------------------------------------------------------------
     # patterns_matrix = read_pictData()
     # nodes = len(patterns_matrix[0])
     #
