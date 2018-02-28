@@ -114,7 +114,8 @@ def main():
     nodes = len(patterns_matrix[0])
 
     #train with p1, p2, p3 and p4
-    train_patterns = np.concatenate(([patterns_matrix[0]],[patterns_matrix[1]],[patterns_matrix[2]],[patterns_matrix[3]]))
+    train_patterns = np.concatenate(([patterns_matrix[0]],[patterns_matrix[1]],[patterns_matrix[2]],[patterns_matrix[3]],\
+                                     [patterns_matrix[4]], [patterns_matrix[5]], [patterns_matrix[6]]))
     W = weight_matrix(nodes, train_patterns)
 
     #make the noisy patterns with 20% of noise
@@ -126,6 +127,12 @@ def main():
     #check if the noisy inputs can be denoised correctly
     for i in range(noisy_patterns.shape[0]):
         output, iterations = sync_update(W,  noisy_patterns[i])
+
+        print(np.sum(abs(output - train_patterns[i])))
+        if np.sum(abs(output - train_patterns[i])) <150 :
+            print(i, ": Correct")
+        else:
+            print(i, ": False")
 
         fig = plt.figure()
         # fig.suptitle("Synchronous update")
