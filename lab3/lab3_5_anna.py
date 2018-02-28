@@ -128,50 +128,52 @@ def random_pattern(row, column):
 
 def main():
  
-    patterns_matrix = read_pictData()
-    nodes = len(patterns_matrix[0])
-    P,N = patterns_matrix.shape
-    all_patterns = patterns_matrix
-    # train with p1, p2, p3 and p4
-    train_patterns = np.concatenate(([patterns_matrix[0]], [patterns_matrix[1]]))
-    # print(train_patterns)
-    output=[]
-    capacity_percentage=[]
+    # patterns_matrix = read_pictData()
+    # nodes = len(patterns_matrix[0])
+    # P,N = patterns_matrix.shape
+    # all_patterns = patterns_matrix
+    # # train with p1, p2, p3 and p4
+    # train_patterns = np.concatenate(([patterns_matrix[0]], [patterns_matrix[1]]))
+    # # print(train_patterns)
+    # output=[]
+    # capacity_percentage=[]
 
-    fig = plt.figure()
-    fig.suptitle("Synchronous update")
-    E=[]
-    for i in range(9):
-        patterns = all_patterns[0:i]
-        W = weight_matrix(nodes, patterns)
-        saved = 0
-        output2=0
-        for j in range(i):
-            output2,it = sync_update(W,  patterns[j])  # check the p10
-          #  output = update(W, patterns[j])  # check the p10
-            diff = np.sum(abs(output2 - patterns[j]))
-            if diff == 0:
-                saved = saved + 1
-        capacity_percentage.append(saved * 100 / (i+1))
-    plt.title("Capacity/patterns trained")
-    plt.plot(np.arange(0,9), capacity_percentage)
-    plt.show()
+    # fig = plt.figure()
+    # fig.suptitle("Synchronous update")
+    # E=[]
+    # for i in range(9):
+    #     patterns = all_patterns[0:i+1]
+    #     W = weight_matrix(nodes, patterns)
+    #     saved = 0
+    #     output2=0
+    #     for j in range(i+1):
+    #         output2,it = sync_update(W,  patterns[j])  # check the p10
+    #       #  output = update(W, patterns[j])  # check the p10
+    #         diff = np.sum(abs(output2 - patterns[j]))
+    #         if diff == 0:
+    #             saved = saved + 1
+    #     capacity_percentage.append(saved * 100 / (i+1))
+    # plt.title("Capacity/patterns trained")
+    # plt.plot(np.arange(0,9), capacity_percentage)
+    # plt.show()
 
     ########### Fer random patterns
 
-    for i in range(1, 200, 10):
-        train_patterns = random_pattern(i, 1024)
-    print(train_patterns.shape)
+    for i in range(1, 301):
+        train_patterns = random_pattern(i, 100)
+
+
+    nodes = len(train_patterns[0])
 
     fig = plt.figure()
-  #  fig.suptitle("Synchronous update")
+    # fig.suptitle("Synchronous update")
     capacity_percentage=[]
     for i in range(train_patterns.shape[0]):
-        patterns = train_patterns[0:i]
+        patterns = train_patterns[0:i+1]
         W = weight_matrix(nodes, patterns)
         saved = 0
         output2 = 0
-        for j in range(i):
+        for j in range(i+1):
             output2, it = sync_update(W, patterns[j])  # check the p10
             #  output = update(W, patterns[j])  # check the p10
             diff = np.sum(abs(output2 - patterns[j]))
@@ -179,9 +181,10 @@ def main():
                 saved = saved + 1
         capacity_percentage.append(saved * 100 / (i + 1))
     plt.title("Capacity/patterns trained")
+    plt.xlabel('Number of patterns')
+    plt.ylabel('Capacity in percentage')
     plt.plot(np.arange(0, train_patterns.shape[0]), capacity_percentage)
     plt.show()
-
 
 
     # for i in range(4):
