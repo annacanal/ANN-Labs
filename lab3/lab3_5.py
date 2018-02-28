@@ -25,6 +25,11 @@ def random_pattern(row, column):
     #     pattern_list.append(patterns)
     # return pattern_list
 
+def other_random_pattern():
+    y = np.random.uniform(-2, 2, (300, 100))
+    yy = np.sign(y)
+    return yy
+
 def pattern_transform(pattern):
     new_pattern = pattern.reshape(32,32)
     return new_pattern
@@ -100,17 +105,20 @@ def energy(weights, pattern):
     return E
 
 def main():
+    np.random.seed(10)
     test_random = np.random.uniform(-2, 2, (1, 1024))
     test = np.sign(test_random)
-    for i in range(10):
-        train_patterns = random_pattern(i, 1024)
+    train_patterns = np.vstack((test, random_pattern(1, 1024)))
+    
+    for i in range(100):
         nodes = 1024
         W = weight_matrix(nodes, train_patterns)
         
-        output = calc_activations(W, test)
+        output = sync_update(W, test)
         E = energy(W, output)
         print(E)
-
+        train_patterns = np.vstack((train_patterns, random_pattern(1, 1024)))
+        
     #---------------------------------
     # patterns_matrix = read_pictData()
     # nodes = len(patterns_matrix[0])
