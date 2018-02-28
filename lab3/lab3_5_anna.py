@@ -67,7 +67,6 @@ def weight_matrix_zeroDiag(nodes, patterns):
         for j in range(W.shape[1]):
             if (j==i):
                 W[i][j] = 0
-
     return W
 
 
@@ -125,6 +124,19 @@ def random_pattern(row, column):
     yy = np.sign(y)
     return yy
 
+def make_noise(original_pattern, percentage):
+    noisy_pattern = np.copy(original_pattern)
+    #how many bits do we need to flip
+    elements_num = noisy_pattern.size * percentage / 100
+    elements_num = int(elements_num)
+    #select that many random indexes
+    indexes = np.random.choice(original_pattern.size, elements_num, replace=False)
+    # flip the bit
+    # for i, idx in enumerate(indexes):
+    #     noisy_pattern[idx] = -1 if noisy_pattern[idx] == 1 else 1
+
+    return noisy_pattern
+
 
 def main():
  
@@ -158,11 +170,11 @@ def main():
     # plt.show()
 
     ########### Fer random patterns
-
+    #### Adding noise too: 
     for i in range(1, 301):
         train_patterns = random_pattern(i, 100)
-
-
+    
+    # train_patterns = make_noise(train_patterns, 50)
     nodes = len(train_patterns[0])
 
     fig = plt.figure()
@@ -180,10 +192,11 @@ def main():
             if diff == 0:
                 saved = saved + 1
         capacity_percentage.append(saved * 100 / (i + 1))
-    plt.title("Capacity/patterns trained")
+    plt.title("Capacity/patterns trained, with 50 % noise")
     plt.xlabel('Number of patterns')
     plt.ylabel('Capacity in percentage')
     plt.plot(np.arange(0, train_patterns.shape[0]), capacity_percentage)
+
     plt.show()
 
 
