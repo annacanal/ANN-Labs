@@ -165,7 +165,7 @@ def main():
         original_patterns = random_pattern(i, 100)
 
     nodes = len(original_patterns[0])
-    percentage = 10 #noise percentage
+    percentage = 30 #noise percentage
 
     ################
     #unbiased with diagonal
@@ -265,7 +265,7 @@ def main():
     plt.xlabel('Number of patterns')
     plt.ylabel('Capacity in percentage')
 
-    #plt.xlim((0, 50))
+    # plt.xlim((0, 50))
     plt.show()
 
 
