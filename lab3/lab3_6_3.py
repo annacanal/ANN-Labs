@@ -118,7 +118,7 @@ def seq_update_book(W, input_pattern, nodes, theta):
     order = np.arange(nodes)
     np.random.shuffle(order)
     for i in order:
-        if np.sum(W[i,:]*input_pattern)>=0:
+        if np.sum(W[i,:]*input_pattern)-theta>=0:
             output[i] = 1
         else:
             output[i] = 0
@@ -199,7 +199,7 @@ def main():
     plt.xlabel('Number of patterns')
     plt.ylabel('Capacity in percentage')
 
-    plt.xlim((0, 50))
+    plt.xlim((0, 300))
     plt.show()
 
 
