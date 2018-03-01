@@ -78,9 +78,6 @@ def update(W, input_pattern,idx):
     new_output = output
     return new_output
 
-
-
-
 def sync_update(W, input_pattern):
     old_output = input_pattern
     diffnum = 0
