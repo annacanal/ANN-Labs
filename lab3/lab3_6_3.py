@@ -153,41 +153,44 @@ def calc_activation(patterns):
 
 
 def main():
-
-    #make sparse patterns
     original_patterns = np.zeros((300, 100))
-    bias_percentage = 5
-    train_patterns = np.zeros((np.shape(original_patterns)))
-    for i in range(original_patterns.shape[0]):
-        train_patterns[i] = make_bias(original_patterns[i], bias_percentage)
-
-    #initialize network
-    nodes = len(original_patterns[0])
 
     # add noise to the patterns that need to be recognised
-    # percentage = 0  # noise percentage
+    # percentage = 20  # noise percentage
     # noisy_patterns = np.zeros((np.shape(train_patterns)))
     # for i in range(noisy_patterns.shape[0]):
     #     noisy_patterns[i] = make_noise(train_patterns[i], percentage)
 
     # fig.suptitle("Synchronous update")
     theta_values = np.arange(0.1, 1, 0.1)
-    for theta in [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]:#theta_values:
-        capacity_percentage = []
-        for i in range(train_patterns.shape[0]):
-            patterns = train_patterns[0:i + 1]
-            rho = calc_activation(patterns)
-            W = weight_matrix(nodes, patterns, rho)
-            saved = 0
-            for j in range(i + 1):
-                output2 = seq_update_book(W, patterns[j], nodes, theta)
-                diff = np.sum(abs(output2 - patterns[j]))
-                if diff == 0:
-                    saved = saved + 1
-            capacity_percentage.append(saved * 100 / (i + 1))
-            print(capacity_percentage)
+    for theta in [0.1,1,100]:#, 0.01, 0.1, 1, 10, 100, 1000, 10000]:#theta_values:
+        all_capacity_percentage = np.zeros(original_patterns.shape[0])
+        for times in [1, 2, 3, 4, 5]:
 
-        plt.plot(np.arange(0, train_patterns.shape[0]), capacity_percentage, label = "bias: "+str(theta))
+            # make sparse patterns
+            bias_percentage = 5
+            train_patterns = np.zeros((np.shape(original_patterns)))
+            for i in range(original_patterns.shape[0]):
+                train_patterns[i] = make_bias(original_patterns[i], bias_percentage)
+
+            # initialize network
+            nodes = len(original_patterns[0])
+
+            capacity_percentage = []
+            for i in range(train_patterns.shape[0]):
+                patterns = train_patterns[0:i + 1]
+                rho = calc_activation(patterns)
+                W = weight_matrix(nodes, patterns, rho)
+                saved = 0
+                for j in range(i + 1):
+                    output2 = seq_update_book(W, patterns[j], nodes, theta)
+                    diff = np.sum(abs(output2 - patterns[j]))
+                    if diff == 0:
+                        saved = saved + 1
+                capacity_percentage.append(saved * 100 / (i + 1))
+                print(capacity_percentage)
+            all_capacity_percentage = all_capacity_percentage + capacity_percentage
+        plt.plot(np.arange(0, train_patterns.shape[0]), all_capacity_percentage/5, label = "bias: "+str(theta))
 
 
 
