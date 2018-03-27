@@ -7,9 +7,13 @@ encoding_dim = 32  # 32 floats -> compression of factor 24.5, assuming the input
 # this is our input placeholder
 input_img = Input(shape=(784,))
 # "encoded" is the encoded representation of the input
-encoded = Dense(encoding_dim, activation='relu')(input_img)
+#we initialize the weights to be small, random, normally distributed
+#and the biases to zero
+encoded = Dense(encoding_dim, activation='relu', kernel_initializer='random_normal',bias_initializer='zeros')(input_img)
+
+
 # "decoded" is the lossy reconstruction of the input
-decoded = Dense(784, activation='sigmoid')(encoded)
+decoded = Dense(784, activation='sigmoid', kernel_initializer='random_normal',bias_initializer='zeros')(encoded)
 
 # this model maps an input to its reconstruction
 autoencoder = Model(input_img, decoded)
@@ -42,7 +46,7 @@ print(x_test.shape)
 
 #Now let's train our autoencoder for 50 epochs:
 autoencoder.fit(x_train, x_train,
-                epochs=50,
+                epochs=20,
                 batch_size=256,
                 shuffle=True,
                 validation_data=(x_test, x_test))
