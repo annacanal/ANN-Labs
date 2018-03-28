@@ -15,34 +15,6 @@ from scipy.ndimage import convolve
 from sklearn.model_selection import train_test_split
 
 
-def nudge(X, y):
-    # initialize the translations to shift the image one pixel
-    # up, down, left, and right, then initialize the new data
-    # matrix and targets
-    translations = [(0, -1), (0, 1), (-1, 0), (1, 0)]
-    data = []
-    target = []
-
-    # loop over each of the digits
-    for (image, label) in zip(X, y):
-        # reshape the image from a feature vector of 784 raw
-        # pixel intensities to a 28x28 'image'
-        image = image.reshape(28, 28)
-
-        # loop over the translations
-        for (tX, tY) in translations:
-            # translate the image
-            M = np.float32([[1, 0, tX], [0, 1, tY]])
-            trans = cv2.warpAffine(image, M, (28, 28))
-
-            # update the list of data and target
-            data.append(trans.flatten())
-            target.append(label)
-
-    # return a tuple of the data matrix and targets
-    return (np.array(data), np.array(target))
-
-
 def train_classifier(rbm, logistic,train,train_targets, learning_rate,n_iter,n_hnodes):
     #rbm = BernoulliRBM(batch_size=10, learning_rate=learning_rate, n_components=n_components, n_iter=n_iter,random_state=None, verbose=0)
     rbm.learning_rate = learning_rate
@@ -54,7 +26,7 @@ def train_classifier(rbm, logistic,train,train_targets, learning_rate,n_iter,n_h
     # Training RBM-Logistic Pipeline
     classifier.fit(train, train_targets)
 
-    return classifier
+    return classifier, rbm
 
 
 
@@ -71,16 +43,16 @@ def plot_images(rbm_50,rbm_75,rbm_100,rbm_150):
     plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
     plt.show()
     # 75 nodes
-    plt.figure(figsize=(10, 10))
-    for i, comp in enumerate(rbm_75.components_):
-        plt.subplot(10, 10, i + 1)
-        plt.imshow(comp.reshape((28, 28)), cmap=plt.cm.gray_r,
-                   interpolation='nearest')
-        plt.xticks(())
-        plt.yticks(())
-    plt.suptitle('75 components extracted by RBM', fontsize=16)
-    plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
-    plt.show()
+    # plt.figure(figsize=(10, 10))
+    # for i, comp in enumerate(rbm_75.components_):
+    #     plt.subplot(10, 10, i + 1)
+    #     plt.imshow(comp.reshape((28, 28)), cmap=plt.cm.gray_r,
+    #                interpolation='nearest')
+    #     plt.xticks(())
+    #     plt.yticks(())
+    # plt.suptitle('75 components extracted by RBM', fontsize=16)
+    # plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+    # plt.show()
     # 100 nodes
     plt.figure(figsize=(10, 10))
     for i, comp in enumerate(rbm_100.components_):
@@ -132,14 +104,23 @@ def main():
 
     # Hyper-parameters:
     learning_rate = 0.06
-    n_iter =20# [10, 20]
+   # n_iter =[10, 20]
+    n_iter = 20
     # More components (hidden nodes) tend to give better prediction performance, but larger fitting time
 
-    #Training
-    classifier_50 = train_classifier(rbm_50, logistic_50,train,train_targets, learning_rate,n_iter,n_hnodes=50)
-    classifier_75 = train_classifier(rbm_75, logistic_75,train,train_targets, learning_rate,n_iter,n_hnodes=75)
-    classifier_100 = train_classifier(rbm_100, logistic_100,train,train_targets, learning_rate,n_iter,n_hnodes=100)
-    classifier_150= train_classifier(rbm_150, logistic_150,train,train_targets, learning_rate,n_iter,n_hnodes=150)
+    error_50=[]
+    error_75=[]
+    error_100=[]
+    error_150=[]
+
+
+    #Training:
+    classifier_50,rbm_50 = train_classifier(rbm_50, logistic_50,train,train_targets, learning_rate,n_iter,n_hnodes=50)
+    classifier_75,rbm_75 = train_classifier(rbm_75, logistic_75,train,train_targets, learning_rate,n_iter,n_hnodes=75)
+    classifier_100,rbm_100 = train_classifier(rbm_100, logistic_100,train,train_targets, learning_rate,n_iter,n_hnodes=100)
+    classifier_150, rbm_150= train_classifier(rbm_150, logistic_150,train,train_targets, learning_rate,n_iter,n_hnodes=150)
+
+
 
     # Evaluation
     print("Evaluation:")
@@ -164,14 +145,13 @@ def main():
     # Plotting
     plot_images(rbm_50,rbm_75,rbm_100,rbm_150)
 
-    #Predict test set
+    # Predict test set
     # image from each digit
-    example_digits_indexs = [0, 1, 2, 3, 5, 6, 7, 8, 14, 18]  # in the test partition
+    example_digits_indexs = [18, 3, 7, 0, 2, 1, 14, 8, 6, 5]  # indexs in the test partition digits: 0,1,2,3,4,5,6,7,8,9
     prediction_50 = rbm_50.gibbs(test).astype(int)
     prediction_75 = rbm_75.gibbs(test).astype(int)
     prediction_100 = rbm_100.gibbs(test).astype(int)
     prediction_150 = rbm_150.gibbs(test).astype(int)
-
     print(calculate_error(prediction_50, test))
     print(calculate_error(prediction_75, test))
     print(calculate_error(prediction_100, test))
@@ -195,6 +175,44 @@ def main():
         plt.subplot(10, 5, 5 * index + 5)
         plt.imshow(prediction_150[i].reshape((28, 28)), cmap=plt.cm.gray_r,
                    interpolation='nearest')
+    plt.show()
+
+    # for i in range(n_iter):
+    #     # Training
+    #
+    #     classifier_50, rbm_50 = train_classifier(rbm_50, logistic_50, train, train_targets, learning_rate, i,n_hnodes=50)
+    #     classifier_75, rbm_75 = train_classifier(rbm_75, logistic_75, train, train_targets, learning_rate, i,  n_hnodes=75)
+    #     classifier_100, rbm_100 = train_classifier(rbm_100, logistic_100, train, train_targets, learning_rate, i, n_hnodes=100)
+    #     classifier_150, rbm_150 = train_classifier(rbm_150, logistic_150, train, train_targets, learning_rate, i, n_hnodes=150)
+    # #Predict test set
+    # # image from each digit
+    #     example_digits_indexs = [18,3,7,0,2,1,14,8,6,5]  # indexs in the test partition digits: 0,1,2,3,4,5,6,7,8,9
+    #     prediction_50 = rbm_50.gibbs(test).astype(int)
+    #     prediction_75 = rbm_75.gibbs(test).astype(int)
+    #     prediction_100 = rbm_100.gibbs(test).astype(int)
+    #     prediction_150 = rbm_150.gibbs(test).astype(int)
+    #
+    #     error_50.append(calculate_error(prediction_50, test))
+    #     error_75.append(calculate_error(prediction_75, test))
+    #     error_100.append(calculate_error(prediction_100, test))
+    #     error_150.append(calculate_error(prediction_150, test))
+    #     print("iterations: "+str(i))
+    #     print(calculate_error(prediction_50, test))
+    #     print(calculate_error(prediction_75, test))
+    #     print(calculate_error(prediction_100, test))
+    #     print(calculate_error(prediction_150, test))
+    #
+    # iterations = np.arange(n_iter)
+    # plt.plot(iterations, error_50, color='blue',  label= "Nodes = 50")
+    # plt.plot(iterations, error_75, color='red', label= "Nodes = 75")
+    # plt.plot(iterations, error_100, color='green',label= "Nodes = 100")
+    # plt.plot(iterations, error_150, color='orange',label= "Nodes = 150")
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Mean Error')
+    # plt.legend()
+    # plt.show()
+
+
 
 
 if __name__ == "__main__":
