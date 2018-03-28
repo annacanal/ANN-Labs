@@ -59,7 +59,7 @@ print(train_targets[0])
 #Now let's train our autoencoder for 50 epochs:
 autoencoder.fit(train, train,
                 epochs=100,
-                batch_size=256,
+                batch_size=32, #default
                 shuffle=True,
                 validation_data=(test, test))
 
