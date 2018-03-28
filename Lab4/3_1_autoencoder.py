@@ -1,7 +1,9 @@
 from keras.layers import Input, Dense
 from keras.models import Model
 from keras import optimizers
+from keras import metrics
 import data_handling
+import tensorflow as tf
 
 
 # this is the size of our encoded representations
@@ -33,8 +35,8 @@ decoder = Model(encoded_input, decoder_layer(encoded_input))
 
 #Now let's train our autoencoder to reconstruct MNIST digits.
 #for training we use stochastic gradient descent as requested
-sgd = optimizers.SGD(lr=0.5, momentum=0, decay=0, nesterov=False)
-autoencoder.compile(optimizer=sgd, loss='binary_crossentropy')
+sgd = optimizers.SGD(lr=0.2, momentum=0, decay=0, nesterov=False)
+autoencoder.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
 
 from keras.datasets import mnist
 import numpy as np
@@ -58,8 +60,9 @@ print(train_targets[0])
 
 #Now let's train our autoencoder for 50 epochs:
 autoencoder.fit(train, train,
-                epochs=100,
-                batch_size=32, #default
+                epochs=10,
+                batch_size=1, #default
+                verbose=2,
                 shuffle=True,
                 validation_data=(test, test))
 
