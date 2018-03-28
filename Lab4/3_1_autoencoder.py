@@ -1,9 +1,11 @@
 from keras.layers import Input, Dense
 from keras.models import Model
 from keras import optimizers
+import data_handling
+
 
 # this is the size of our encoded representations
-encoding_dim = 32  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
+encoding_dim = 50  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
 
 # this is our input placeholder
 input_img = Input(shape=(784,))
@@ -31,7 +33,7 @@ decoder = Model(encoded_input, decoder_layer(encoded_input))
 
 #Now let's train our autoencoder to reconstruct MNIST digits.
 #for training we use stochastic gradient descent as requested
-sgd = optimizers.SGD(lr=0.3, momentum=0, decay=0, nesterov=False)
+sgd = optimizers.SGD(lr=0.5, momentum=0, decay=0, nesterov=False)
 autoencoder.compile(optimizer=sgd, loss='binary_crossentropy')
 
 from keras.datasets import mnist
@@ -47,16 +49,23 @@ x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 print(x_train.shape)
 print(x_test.shape)
 
+train,train_targets = data_handling.read_train_dataset()
+test, test_targets = data_handling.read_test_dataset()
+
+print(train[0])
+print(train_targets[0])
+
+
 #Now let's train our autoencoder for 50 epochs:
-autoencoder.fit(x_train, x_train,
-                epochs=50,
+autoencoder.fit(train, train,
+                epochs=100,
                 batch_size=256,
                 shuffle=True,
-                validation_data=(x_test, x_test))
+                validation_data=(test, test))
 
 # encode and decode some digits
 # note that we take them from the *test* set
-encoded_imgs = encoder.predict(x_test)
+encoded_imgs = encoder.predict(test)
 decoded_imgs = decoder.predict(encoded_imgs)
 
 # use Matplotlib (don't ask)
@@ -67,7 +76,7 @@ plt.figure(figsize=(20, 4))
 for i in range(n):
     # display original
     ax = plt.subplot(2, n, i + 1)
-    plt.imshow(x_test[i].reshape(28, 28))
+    plt.imshow(test[i].reshape(28, 28))
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
