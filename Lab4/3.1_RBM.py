@@ -104,7 +104,6 @@ def main():
 
     # Hyper-parameters:
     learning_rate = 0.06
-   # n_iter =[10, 20]
     n_iter = 20
     # More components (hidden nodes) tend to give better prediction performance, but larger fitting time
 
