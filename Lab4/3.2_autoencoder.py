@@ -5,38 +5,43 @@ import data_handling
 import matplotlib.pyplot as plt
 
 
-encoding_dim = 50
+# encoding_dim = 50
+
 input_img = Input(shape=(784,))
-encoded = Dense(encoding_dim, activation='relu', kernel_initializer='random_normal',bias_initializer='zeros')(input_img)
 
+#------ 2 hidden layers----------------
+encoded = Dense(128, activation = 'relu', kernel_initializer='random_normal',bias_initializer='zeros')(input_img)
+encoded = Dense(32, activation = 'relu')(encoded)
 
-# "decoded" is the lossy reconstruction of the input
-decoded = Dense(784, activation='sigmoid', kernel_initializer='random_normal',bias_initializer='zeros')(encoded)
+decoded = Dense(128, activation = 'relu')(encoded)
+decoded = Dense(784, activation='sigmoid', kernel_initializer='random_normal',bias_initializer='zeros')(decoded)
+
+# #------ 3 hidden layers -----------------
+# encoded = Dense(128, activation = 'relu', kernel_initializer='random_normal',bias_initializer='zeros')(input_img)
+# encoded = Dense(64, activation = 'relu')(encoded)
+# encoded = Dense(32, activation = 'relu')(encoded)
+
+# decoded = Dense(32, activation = 'relu')(encoded)
+# decoded = Dense(128, activation = 'relu')(decoded)
+# decoded = Dense(784, activation='sigmoid', kernel_initializer='random_normal',bias_initializer='zeros')(decoded)
+# #----------------------------------------
 
 autoencoder = Model(input_img, decoded)
 encoder = Model(input_img, encoded)
-
-
-encoded_input = Input(shape=(encoding_dim,))
+encoded_input = Input(shape=(128,))
 decoder_layer = autoencoder.layers[-1]
 decoder = Model(encoded_input, decoder_layer(encoded_input))
 
 
-sgd = optimizers.SGD(lr=0.5, momentum=0, decay=0, nesterov=False)
-autoencoder.compile(optimizer=sgd, loss='binary_crossentropy')
-
+sgd = optimizers.SGD(lr=0.2, momentum=0, decay=0, nesterov=False)
+autoencoder.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
 
 train, train_targets = data_handling.read_train_dataset()
 test, test_targets = data_handling.read_test_dataset()
 
-print(train[0])
-print(train_targets[0])
-
-
-#Now let's train our autoencoder for 50 epochs:
 autoencoder.fit(train, train,
-                epochs=100,
-                batch_size=50, #default
+                epochs=50,
+                batch_size=300, #default
                 shuffle=True,
                 validation_data=(test, test))
 
