@@ -6,23 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def get_mae_error_per_epoch(train, test, epochs):
+def get_mae_error_per_epoch(train, test, nodes, epochs):
     mae_error = np.zeros(epochs-1)
 
-    for ep in range(1, 4, 1):
-        encoder, decoder, autoencoder = create_autoencoder(nodes)
-
-        # Now let's train our autoencoder for 50 epochs:
-        history = autoencoder.fit(train, train,
-                        epochs=ep,
-                        batch_size=1,  # default
-                        verbose=2,
-                        shuffle=True,
-                        validation_split=0.3,
-                        # validation_data=(test, test)
-                        )
+    for ep in range(1, epochs, 1):
+        encoder, decoder, autoencoder = create_and_fit_autoencoder(ep, nodes, train)
         what = autoencoder.evaluate(x=test, y=test, verbose=2)
-
         mae_error[ep-1] = what[1]
 
     return mae_error
@@ -59,48 +48,138 @@ def create_autoencoder(encoding_nodes):
 
     return (encoder, decoder, autoencoder)
 
-epochs = 21
-# mae_errors = np.zeros((4, epochs-1))
+def plot_error_per_epoch(epochs, diff_nodes, train, test):
 
-# this is the size of our encoded representations
-for i,nodes in enumerate([50,75,100,150]):
+    # mae_errors = np.zeros((4, epochs-1))
+
+    # this is the size of our encoded representations
+    for i,nodes in enumerate(diff_nodes):
+
+        mae_errors = np.zeros(epochs - 1)
+        mae_errors = get_mae_error_per_epoch(train, test, nodes, epochs)
+
+        x = np.arange(1, epochs, 1)
+        plt.plot(x, mae_errors, label=('Nodes = '+str(nodes)))
+    plt.legend()
+    plt.ylabel('Mean Error')
+    plt.xlabel('Epochs')
+    plt.savefig('error_per_epoch.png')
+    plt.show()
+
+def create_and_fit_autoencoder(epochs, nodes, train, test):
+    encoder, decoder, autoencoder = create_autoencoder(nodes)
+
+    # Now let's train our autoencoder for ep epochs:
+    history = autoencoder.fit(train, train,
+                              epochs=epochs,
+                              batch_size=1,  # default
+                              verbose=2,
+                              shuffle=True,
+                              # validation_split=0.3,
+                              validation_data=(test, test)
+                              )
+
+    return (encoder, decoder, autoencoder, history)
+
+def evaluate_autoencoder(epochs, nodes, train, test):
+    encoder, decoder, autoencoder = create_and_fit_autoencoder(epochs, nodes, train)
+    what = autoencoder.evaluate(x=test, y=test, verbose=2)
+    mae_error = what[1]
+
+    return mae_error
+
+def evaluate_autoencoders(epochs, diff_nodes, train, test):
+
+    for i,nodes in enumerate(diff_nodes):
+        error = evaluate_autoencoder(epochs, nodes, train, test)
+        print('error for nodes ', nodes, ': ', error)
 
 
-    #We use the prenormalized data given to us
-    train,train_targets = data_handling.read_train_dataset()
+def plot_digits(predictions, test):
+    example_digits_indexs = [18, 3, 7, 0, 2, 1, 14, 8, 6, 5]  # indexs in the test partition digits: 0,1,2,3,4,5,6,7,8,9
+
+    plt.figure(figsize=(20, 20))
+
+    for index, i in enumerate(example_digits_indexs):
+        plt.subplot(10, 5, 5 * index + 1)
+        plt.imshow(test[i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+        plt.subplot(10, 5, 5 * index + 2)
+        plt.imshow(predictions[0][i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+        plt.subplot(10, 5, 5 * index + 3)
+        plt.imshow(predictions[1][i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+        plt.subplot(10, 5, 5 * index + 4)
+        plt.imshow(predictions[2][i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+        plt.subplot(10, 5, 5 * index + 5)
+        plt.imshow(predictions[3][i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                   interpolation='nearest')
+    plt.savefig('img_of_digits.png')
+    plt.show()
+
+def plot_digits_for_diff_nodes(diff_nodes, epochs, train, test):
+    predictions = []
+    for nodes in diff_nodes:
+        encoder, decoder, autoencoder = create_and_fit_autoencoder(epochs, nodes, train)
+        error = autoencoder.evaluate(x=test, y=test, verbose=2)
+        print('error for nodes ', nodes, ': ', error[1])
+
+        encoded_imgs = encoder.predict(test)
+        decoded_imgs = decoder.predict(encoded_imgs)
+
+        predictions.append(decoded_imgs)
+
+    plot_digits(predictions, test)
+
+def plot_weights(diff_nodes, epochs, train, test):
+    histories = []
+    for nodes in diff_nodes:
+        encoder, decoder, autoencoder, history = create_and_fit_autoencoder(epochs, nodes, train, test)
+
+        histories.append(history)
+
+        the_weights = (autoencoder.get_weights())[2]
+
+        if nodes in [50, 100]:
+            plt.figure(figsize=(10, 10))
+            for i in range(nodes):
+                plt.subplot(10, 10, i + 1)
+                plt.imshow(the_weights[i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                           interpolation='nearest')
+                plt.xticks(())
+                plt.yticks(())
+            plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+            plt.savefig(str(nodes)+'_weights_autoencoder.png')
+            # plt.show()
+
+    for i,nodes in enumerate(diff_nodes):
+
+        mae_errors = histories[i].history['val_mean_absolute_error']
+        x = np.arange(1, epochs+1, 1)
+        plt.plot(x, mae_errors, label=('Nodes = '+str(nodes)))
+    plt.legend()
+    plt.ylabel('Mean Error')
+    plt.xlabel('Epochs')
+    plt.savefig('error_per_epoch.png')
+    plt.show()
+
+
+def main():
+    # We use the prenormalized data given to us
+    train, train_targets = data_handling.read_train_dataset()
     test, test_targets = data_handling.read_test_dataset()
 
-    mae_errors = np.zeros(epochs - 1)
-    mae_errors = get_mae_error_per_epoch(train, test, epochs)
+    epochs = 20
+    diff_nodes = [50, 75, 100, 150]
 
-    x = np.arange(1, epochs, 1)
-    plt.plot(x, mae_errors, label=('Nodes = '+str(nodes)))
-plt.legend()
-plt.ylabel('Mean Error')
-plt.xlabel('Epochs')
-plt.savefig('speedup.png')
-plt.show()
+    # plot_error_per_epoch(epochs, diff_nodes, train, test)
 
-# # encode and decode some digits
-# # note that we take them from the *test* set
-# encoded_imgs = encoder.predict(test)
-# decoded_imgs = decoder.predict(encoded_imgs)
-#
-#
-# n = 10  # how many digits we will display
-# plt.figure(figsize=(20, 4))
-# for i in range(n):
-#     # display original
-#     ax = plt.subplot(2, n, i + 1)
-#     plt.imshow(test[i].reshape(28, 28))
-#     plt.gray()
-#     ax.get_xaxis().set_visible(False)
-#     ax.get_yaxis().set_visible(False)
-#
-#     # display reconstruction
-#     ax = plt.subplot(2, n, i + 1 + n)
-#     plt.imshow(decoded_imgs[i].reshape(28, 28))
-#     plt.gray()
-#     ax.get_xaxis().set_visible(False)
-#     ax.get_yaxis().set_visible(False)
-# plt.show()
+    #evaluate_autoencoders(epochs, diff_nodes, train, test)
+
+    #plot_digits_for_diff_nodes(diff_nodes, epochs, train, test)
+
+    plot_weights(diff_nodes, epochs, train, test)
+
+main()
