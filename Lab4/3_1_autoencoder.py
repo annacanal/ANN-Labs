@@ -43,7 +43,7 @@ def create_autoencoder(encoding_nodes):
 
     # Now let's train our autoencoder to reconstruct MNIST digits.
     # for training we use stochastic gradient descent as requested
-    sgd = optimizers.SGD(lr=0.1, momentum=0, decay=0, nesterov=False)
+    sgd = optimizers.SGD(lr=0.3, momentum=0, decay=0, nesterov=False)
     autoencoder.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
 
     return (encoder, decoder, autoencoder)
@@ -75,7 +75,7 @@ def create_and_fit_autoencoder(epochs, nodes, train, test):
                               batch_size=1,  # default
                               verbose=2,
                               shuffle=True,
-                              # validation_split=0.3,
+                              #validation_split=0.3,
                               validation_data=(test, test)
                               )
 
@@ -133,16 +133,22 @@ def plot_digits_for_diff_nodes(diff_nodes, epochs, train, test):
 
     plot_digits(predictions, test)
 
-def plot_weights(diff_nodes, epochs, train, test):
+def plot_everything(diff_nodes, epochs, train, test):
     histories = []
+    predictions = []
     for nodes in diff_nodes:
         encoder, decoder, autoencoder, history = create_and_fit_autoencoder(epochs, nodes, train, test)
+        print("MAE ERROR for ", nodes, "nodes: ", (autoencoder.evaluate(x=test, y=test, verbose=2))[1])
 
         histories.append(history)
 
+        encoded_imgs = encoder.predict(test)
+        decoded_imgs = decoder.predict(encoded_imgs)
+        predictions.append(decoded_imgs)
+
         the_weights = (autoencoder.get_weights())[2]
 
-        if nodes in [50, 100]:
+        if nodes == 50 or nodes == 100:
             plt.figure(figsize=(10, 10))
             for i in range(nodes):
                 plt.subplot(10, 10, i + 1)
@@ -153,6 +159,7 @@ def plot_weights(diff_nodes, epochs, train, test):
             plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
             plt.savefig(str(nodes)+'_weights_autoencoder.png')
             # plt.show()
+            plt.close()
 
     for i,nodes in enumerate(diff_nodes):
 
@@ -164,6 +171,9 @@ def plot_weights(diff_nodes, epochs, train, test):
     plt.xlabel('Epochs')
     plt.savefig('error_per_epoch.png')
     plt.show()
+    plt.close()
+
+    plot_digits(predictions, test)
 
 
 def main():
@@ -171,15 +181,9 @@ def main():
     train, train_targets = data_handling.read_train_dataset()
     test, test_targets = data_handling.read_test_dataset()
 
-    epochs = 20
+    epochs = 75
     diff_nodes = [50, 75, 100, 150]
 
-    # plot_error_per_epoch(epochs, diff_nodes, train, test)
-
-    #evaluate_autoencoders(epochs, diff_nodes, train, test)
-
-    #plot_digits_for_diff_nodes(diff_nodes, epochs, train, test)
-
-    plot_weights(diff_nodes, epochs, train, test)
+    plot_everything(diff_nodes, epochs, train, test)
 
 main()
