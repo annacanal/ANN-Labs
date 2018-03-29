@@ -4,15 +4,7 @@ import numpy as np
 from sklearn import linear_model, datasets, metrics
 import data_handling
 from sklearn.pipeline import Pipeline
-import cv2
 import matplotlib.pyplot as plt
-
-from matplotlib import animation
-from mpl_toolkits.mplot3d import Axes3D
-
-from scipy.ndimage import convolve
-
-from sklearn.model_selection import train_test_split
 
 
 def train_classifier(rbm, logistic,train,train_targets, learning_rate,n_iter,n_hnodes):
@@ -67,7 +59,7 @@ def plot_images(rbm_50,rbm_75,rbm_100,rbm_150):
     # 150 nodes
     # plt.figure(figsize=(10, 10))
     # for i, comp in enumerate(rbm_150.components_):
-    #     plt.subplot(10, 10, i + 1)
+    #     plt.subplot(10, 15, i + 1)
     #     plt.imshow(comp.reshape((28, 28)), cmap=plt.cm.gray_r,
     #                interpolation='nearest')
     #     plt.xticks(())
