@@ -4,17 +4,7 @@ import numpy as np
 from sklearn import linear_model, datasets, metrics
 import data_handling
 from sklearn.pipeline import Pipeline
-import cv2
 import matplotlib.pyplot as plt
-
-from matplotlib import animation
-from mpl_toolkits.mplot3d import Axes3D
-
-from scipy.ndimage import convolve
-
-from sklearn.model_selection import train_test_split
-
-
 
 
 def calculate_error(prediction, test):
