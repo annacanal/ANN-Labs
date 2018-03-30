@@ -148,6 +148,7 @@ def plot_everything(diff_nodes, epochs, train, test):
 
         the_weights = (autoencoder.get_weights())[2]
 
+
         if nodes == 50 or nodes == 100:
             plt.figure(figsize=(10, 10))
             for i in range(nodes):
