@@ -62,8 +62,8 @@ train_targets = np_utils.to_categorical(train_targets)
 test_targets = np_utils.to_categorical(test_targets)
 
 autoencoder.fit(train, train,
-                epochs=75,
-                batch_size=1, #default
+                epochs=2,
+                batch_size=100, #default
                 shuffle=True,
                 validation_data=(test, test))
 
@@ -79,8 +79,8 @@ sgd = optimizers.SGD(lr=0.1, momentum=0, decay=0, nesterov=False)
 classifier.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
 
 hist = classifier.fit(train, train_targets, 
-                epochs = 20, 
-                batch_size = 1, 
+                epochs = 2, 
+                batch_size = 100, 
                 shuffle = True,
                 validation_data=(test, test_targets))
 
@@ -112,47 +112,45 @@ for i in range(n):
     # np.save('test_3_layers_75epochs_0.3lr.npy', hist.history)
 plt.show()
 
-# # Plotting images for 3rd layer: 
-weights = encoder.get_weights()[0]
-print(np.array(weights).shape)
+# Plotting images for layers: 
+
+weights_3 = decoder_3.get_weights()[0]
+weights_2 = decoder_2.get_weights()[0]
+weights_1 = decoder_1.get_weights()[0]
+
+print(np.array(weights_3).shape)
+print(np.array(weights_2).shape)
+print(np.array(weights_1).shape)
+
+plt.figure(figsize=(10, 10))
+for i in range(150):
+    plt.subplot(10, 15, i + 1)
+    plt.imshow(weights_3[i].reshape((28, 28)), cmap=plt.cm.gray_r,
+                interpolation='nearest')
+    plt.xticks(())
+    plt.yticks(())
+plt.suptitle('150 components extracted by autoencoder layer 1', fontsize=16)
+plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+plt.show()
+
+plt.figure(figsize=(10, 10))
+for i in range(120):
+    plt.subplot(10, 12, i + 1)
+    plt.imshow(weights_2[i].reshape((10, 15)), cmap=plt.cm.gray_r,
+                interpolation='nearest')
+    plt.xticks(())
+    plt.yticks(())
+plt.suptitle('120 components extracted by autoencoder layer 2', fontsize=16)
+plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
+plt.show()
 
 plt.figure(figsize=(10, 10))
 for i in range(90):
     plt.subplot(10, 10, i + 1)
-    plt.imshow(weights_1[i].reshape((10, 12)), cmap=plt.cm.gray_r,
+    plt.imshow(weights_1[i].reshape((10, 15)), cmap=plt.cm.gray_r,
                 interpolation='nearest')
     plt.xticks(())
     plt.yticks(())
 plt.suptitle('90 components extracted by autoencoder layer 3', fontsize=16)
 plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
 plt.show()
-
-# weights_3 = decoder_3.get_weights()[0]
-# weights_2 = decoder_2.get_weights()[0]
-# weights_1 = decoder_1.get_weights()[0]
-
-# print(np.array(weights_3).shape)
-# print(np.array(weights_2).shape)
-# print(np.array(weights_1).shape)
-
-# plt.figure(figsize=(10, 10))
-# for i in range(150):
-#     plt.subplot(10, 15, i + 1)
-#     plt.imshow(weights_3[i].reshape((28, 28)), cmap=plt.cm.gray_r,
-#                 interpolation='nearest')
-#     plt.xticks(())
-#     plt.yticks(())
-# plt.suptitle('150 components extracted by autoencoder layer 1', fontsize=16)
-# plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
-# plt.show()
-
-# plt.figure(figsize=(10, 10))
-# for i in range(120):
-#     plt.subplot(10, 12, i + 1)
-#     plt.imshow(weights_2[i].reshape((10, 15)), cmap=plt.cm.gray_r,
-#                 interpolation='nearest')
-#     plt.xticks(())
-#     plt.yticks(())
-# plt.suptitle('120 components extracted by autoencoder layer 2', fontsize=16)
-# plt.subplots_adjust(0.08, 0.02, 0.92, 0.85, 0.08, 0.23)
-# plt.show()
