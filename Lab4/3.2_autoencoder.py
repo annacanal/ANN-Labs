@@ -53,8 +53,9 @@ decoder_2 = Model(input = encoded_input_2, output = decoder_layer_2(encoded_inpu
 decoder_3 = Model(input = encoded_input_3, output = decoder_layer_3(encoded_input_3))
 
 #Training in pre-training phase
-sgd = optimizers.SGD(lr=0.3, momentum=0, decay=0, nesterov=False)
-autoencoder.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
+# sgd = optimizers.SGD(lr=5, momentum=0, decay=0, nesterov=False)
+ada = optimizers.Adadelta(lr=1, epsilon=None, decay=0.0)
+autoencoder.compile(optimizer=ada, loss='binary_crossentropy')
 
 train, train_targets = data_handling.read_train_dataset()
 test, test_targets = data_handling.read_test_dataset()
@@ -62,8 +63,8 @@ train_targets = np_utils.to_categorical(train_targets)
 test_targets = np_utils.to_categorical(test_targets)
 
 autoencoder.fit(train, train,
-                epochs=2,
-                batch_size=100, #default
+                epochs=200,
+                batch_size=10, #default
                 shuffle=True,
                 validation_data=(test, test))
 
@@ -75,12 +76,13 @@ decoded = Dense(10, activation='sigmoid', kernel_initializer='random_normal', bi
 classifier = Model(input = input_img, output = decoded)
 
 #training classifier
-sgd = optimizers.SGD(lr=0.1, momentum=0, decay=0, nesterov=False)
-classifier.compile(optimizer=sgd, loss='mean_squared_error', metrics=['mae'])
+# sgd = optimizers.SGD(lr=5, momentum=0, decay=0, nesterov=False)
+ada = optimizers.Adadelta(lr=1, epsilon=None, decay=0.0)
+classifier.compile(optimizer=ada, loss='binary_crossentropy')
 
 hist = classifier.fit(train, train_targets, 
-                epochs = 2, 
-                batch_size = 100, 
+                epochs = 200, 
+                batch_size = 10, 
                 shuffle = True,
                 validation_data=(test, test_targets))
 
@@ -91,7 +93,8 @@ decoded_imgs = decoder_1.predict(encoded_imgs)
 decoded_imgs = decoder_2.predict(decoded_imgs)
 decoded_imgs = decoder_3.predict(decoded_imgs)
 
-evaluate(test, decoded_imgs.round()) #classifier or decdoded_imgs?
+
+evaluate(test_targets, predictions) #classifier or decdoded_imgs?
 #--------------------------------------------------------------------------------
 #Plotting digits: 
 n = 10  
@@ -118,9 +121,9 @@ weights_3 = decoder_3.get_weights()[0]
 weights_2 = decoder_2.get_weights()[0]
 weights_1 = decoder_1.get_weights()[0]
 
-print(np.array(weights_3).shape)
-print(np.array(weights_2).shape)
-print(np.array(weights_1).shape)
+# print(np.array(weights_3).shape)
+# print(np.array(weights_2).shape)
+# print(np.array(weights_1).shape)
 
 plt.figure(figsize=(10, 10))
 for i in range(150):
@@ -147,7 +150,7 @@ plt.show()
 plt.figure(figsize=(10, 10))
 for i in range(90):
     plt.subplot(10, 10, i + 1)
-    plt.imshow(weights_1[i].reshape((10, 15)), cmap=plt.cm.gray_r,
+    plt.imshow(weights_1[i].reshape((10, 12)), cmap=plt.cm.gray_r,
                 interpolation='nearest')
     plt.xticks(())
     plt.yticks(())
