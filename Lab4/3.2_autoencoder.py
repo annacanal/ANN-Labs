@@ -30,14 +30,14 @@ def training(my_epochs, layers, input_img, train, test, train_targets, test_targ
         decoded = Dense(150, activation = 'relu')(decoded)
         decoded = Dense(784, activation='sigmoid')(decoded)
 
-    if layers == 2: 
+    elif layers == 2:
         encoded = Dense(150, activation = 'relu')(input_img)
         encoded = Dense(120, activation = 'relu')(encoded)
 
         decoded = Dense(150, activation = 'relu')(encoded)
         decoded = Dense(784, activation='sigmoid')(decoded)
 
-    if layers == 1:
+    elif layers == 1:
         encoded = Dense(150, activation = 'relu')(input_img)
 
         decoded = Dense(784, activation='sigmoid')(encoded)
